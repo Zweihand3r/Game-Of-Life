@@ -1,0 +1,20 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>qtquickcontrols2.conf</file>
+        <file>World.qml</file>
+        <file>Cell.qml</file>
+        <file>CustomButton.qml</file>
+        <file>DebugCell.qml</file>
+        <file>Console.qml</file>
+        <file>ToggleButton.qml</file>
+        <file>Controls.qml</file>
+        <file>CustomComboBox.qml</file>
+        <file>CustomDial.qml</file>
+        <file>CustomRadioButton.qml</file>
+        <file>CustomSwitch.qml</file>
+        <file>LoadingIndicator.qml</file>
+        <file>ColorPalette.qml</file>
+        <file>ColorButton.qml</file>
+    </qresource>
+</RCC>
