@@ -16,19 +16,17 @@ Button {
     property bool switchState: true
     property bool connected: false
 
-    property bool round: width === height && !square
-
     background: Rectangle {
         color: "transparent"
         radius: dimension / 2
-        border.width: 10
+        border.width: 5
         border.color: tint
 
         Rectangle {
-            x: 15
-            y: 15
-            width: control.width - 30
-            height: control.height - 30
+            x: 10
+            y: 10
+            width: control.width - 20
+            height: control.height - 20
             radius: dimension / 2
             color: tint
             scale: switchState ? 1 : 0

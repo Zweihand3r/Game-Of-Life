@@ -16,5 +16,6 @@
         <file>LoadingIndicator.qml</file>
         <file>ColorPalette.qml</file>
         <file>ColorButton.qml</file>
+        <file>RadialButton.qml</file>
     </qresource>
 </RCC>

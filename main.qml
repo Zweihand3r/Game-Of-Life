@@ -17,12 +17,27 @@ ApplicationWindow {
     property int initialRowCount: 32
     property int initialColumnCount: 64
 
+    property bool isCp: true
+
     World {
         rows: initialRowCount
         columns: initialColumnCount
     }
 
-//    ColorPalette {
+    ColorPalette {
+        id: cp
+    }
 
-//    }
+    Button {
+        onClicked: {
+            if (!isCp) {
+                isCp = true
+                cp.presentPalette()
+            }
+            else {
+                isCp = false
+                cp.dismissPalette()
+            }
+        }
+    }
 }
