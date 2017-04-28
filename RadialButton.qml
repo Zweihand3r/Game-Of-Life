@@ -7,7 +7,7 @@ Rectangle {
     height: 105
     color: "transparent"
     border.color: "white"
-    border.width: selected ? 4 : 0
+    border.width: selected ? 2 : 0
 
     property bool selected: false
     property int contentInsetX: 0
