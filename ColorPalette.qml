@@ -9,6 +9,7 @@ Rectangle {
     color: "transparent"
     anchors.horizontalCenter: parent.horizontalCenter
     anchors.verticalCenter: parent.verticalCenter
+    scale: 0
 
     property int paletteIndex: -1
 
@@ -42,11 +43,17 @@ Rectangle {
     }
 
     function presentPalette() {
-        scale = 1
-        presentCompletionTimer.start()
+        if (scale !== 1) {
+            scale = 1
+            presentCompletionTimer.start()
+        }
     }
 
     function dismissPalette() {
+        if (scale === 0) {
+            return
+        }
+
         if (paletteIndex > -1) {
             expandingOne.rotation = 60
             expandingOne.opacity = 0
@@ -61,8 +68,9 @@ Rectangle {
     }
 
     function radialSelection(index) {
-        defaultRadial.selected = false // 0
-        randomRadial.selected = false // 3
+        console.log("Called")
+        defaultRadial.selected = index === 0 // 0
+        randomRadial.selected = index === 3 // 3
 
         switch (index) {
         case -1:
@@ -100,6 +108,7 @@ Rectangle {
     }
 
     Rectangle { // Move below EO
+        id: innerWorld
         width: 240
         height: 240
         radius: 120
@@ -107,6 +116,12 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         color: "transparent"
         clip: true
+        border.color: "White"
+        border.width: 3
+
+        Behavior on border.color {
+            ColorAnimation { duration: 120 }
+        }
 
         Rectangle {
             id: innerCircle
@@ -117,6 +132,45 @@ Rectangle {
             rotation: 45
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
+
+            Behavior on color {
+                ColorAnimation { duration: 120 }
+            }
+
+            MouseArea {
+                id: dismissMouse
+                width: 220
+                height: 220
+                hoverEnabled: true
+
+                onEntered: {
+                    var redTint = "#DD4332"
+                    innerWorld.border.color = redTint
+                    innerCircle.color = redTint
+
+                    defaultRadial.color = "black"
+                    randomRadial.color = "black"
+                }
+
+                onExited: {
+                    innerWorld.border.color = "white"
+                    innerCircle.color = "transparent"
+
+                    transparetor.start()
+                }
+
+                onClicked: dismissPalette()
+
+                Timer {
+                    id: transparetor
+                    running: false
+                    interval: 120
+                    onTriggered: {
+                        defaultRadial.color = "transparent"
+                        randomRadial.color = "transparent"
+                    }
+                }
+            }
 
             Rectangle {
                 id: mask
@@ -146,12 +200,14 @@ Rectangle {
                 RadialButton {
                     y: 115
                     title: "-"
+                    color: "black" // remove
                 }
 
                 RadialButton {
                     x: 115
                     y: 115
                     title: "-"
+                    color: "black" // remove
                 }
 
                 RadialButton {

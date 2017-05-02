@@ -6,8 +6,6 @@ Rectangle {
     width: 105
     height: 105
     color: "transparent"
-    border.color: "white"
-    border.width: selected ? 2 : 0
 
     property bool selected: false
     property int contentInsetX: 0
@@ -16,16 +14,23 @@ Rectangle {
 
     signal pressed()
 
-    Behavior on color {
-        ColorAnimation { duration: 120 }
-    }
+    Rectangle {
+        id: rootground
+        width: 105
+        height: 105
+        color: "transparent"
 
-    Behavior on border.width {
-        NumberAnimation { duration: 120 }
+        Behavior on color {
+            ColorAnimation { duration: 120 }
+        }
+
+        Behavior on opacity {
+            OpacityAnimator { duration: 120 }
+        }
     }
 
     Text {
-        id: text
+        id: labelText
         x: contentInsetX
         y: contentInsetY
         width: 105
@@ -46,27 +51,51 @@ Rectangle {
         }
     }
 
+    function selectionBypass() {
+        if (selected) {
+            rootground.color = "white"
+            rootground.opacity = 1
+
+            labelText.color = "black"
+            labelText.scale = 1.1
+        }
+        else {
+            rootground.color = "transparent"
+
+            labelText.color = "white"
+            labelText.scale = 1
+        }
+    }
+
     MouseArea {
         anchors.fill: parent
         hoverEnabled: true
 
         onEntered: {
-            root.color = "white"
+            if (!selected) {
+                rootground.color = "white"
+                rootground.opacity = 0.75
 
-            text.color = "black"
-            text.scale = 1.25
+                labelText.color = "black"
+                labelText.scale = 1.1
+            }
         }
 
         onExited: {
-            root.color = "transparent"
+            if (!selected) {
+                rootground.color = "transparent"
+                rootground.opacity = 1
 
-            text.color = "white"
-            text.scale = 1
+                labelText.color = "white"
+                labelText.scale = 1
+            }
         }
 
         onPressed: {
             root.pressed()
-            selected = !selected
+            selected = true
         }
     }
+
+    onSelectedChanged: selectionBypass()
 }

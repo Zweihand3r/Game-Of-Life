@@ -9,6 +9,7 @@ Rectangle {
 
     property bool debug: false
 
+    property bool worldActive: false
     property bool playActive: false
     property bool menuActive: false
     property bool colorPaletteHovered: false
@@ -81,6 +82,9 @@ Rectangle {
             generationIntervalClock.start()
         }
         else {
+            // Generation completes here
+            worldActive = true
+
             generationProcessIndex = 0
             setAnimation(animate)
 
@@ -89,6 +93,8 @@ Rectangle {
     }
 
     function recycleWorld() {
+        worldActive = false
+
         if (playActive) {
             playTextTransitionPhaseI.start()
             playActive = false
@@ -1012,6 +1018,8 @@ Rectangle {
             menuText.scale = 1.05
 
             if (!menuActive) {
+                colorPalette.dismissPalette()
+
                 menuActive = true
 
                 transitionToMenu.start()
@@ -1036,9 +1044,11 @@ Rectangle {
         hoverEnabled: true
 
         onEntered: {
-            colorPaletteHovered = true
-            colorTextFrame.scale = 1.1
-            sidePanel.x = 1720
+            if (worldActive) {
+                colorPaletteHovered = true
+                colorTextFrame.scale = 1.1
+                sidePanel.x = 1720
+            }
         }
 
         onExited: {
@@ -1051,10 +1061,20 @@ Rectangle {
         }
 
         onPressed: {
-            colorTextFrame.scale = 1.05
+            if (worldActive) {
+                if (menuActive) {
+                    menuActive = false
+
+                    transitionFromMenu.start()
+                    controls.dismiss()
+                }
+
+                colorPalette.presentPalette()
+                colorTextFrame.scale = 1.05
+            }
         }
 
-        onReleased: colorTextFrame.scale = 1.1
+        onReleased: colorTextFrame.scale = worldActive ? 1.1 : 1
     }
 
     MouseArea {
@@ -1066,8 +1086,10 @@ Rectangle {
         hoverEnabled: true
 
         onEntered: {
-            playText.scale = 1.1
-            sidePanel.x = 1720
+            if (worldActive) {
+                playText.scale = 1.1
+                sidePanel.x = 1720
+            }
         }
 
         onExited: {
@@ -1078,20 +1100,22 @@ Rectangle {
         }
 
         onPressed: {
-            playTextTransitionPhaseI.start()
+           if (worldActive) {
+               playTextTransitionPhaseI.start()
 
-            if (!playActive) {
-                playActive = true
+               if (!playActive) {
+                   playActive = true
 
-                transitionToPlay.start()
-                play()
-            }
-            else {
-                playActive = false
+                   transitionToPlay.start()
+                   play()
+               }
+               else {
+                   playActive = false
 
-                transitionToPause.start()
-                worldClock.stop()
-            }
+                   transitionToPause.start()
+                   worldClock.stop()
+               }
+           }
         }
     }
 
@@ -1112,6 +1136,12 @@ Rectangle {
         onAnimationEnabled: { setAnimation(status); animate = status }
         onIntervalGenerated: cycleInterval = interval
         onSpacingSelected: gridSpacing = spacing
+    }
+
+    ColorPalette {
+        id: colorPalette
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
     }
 
 

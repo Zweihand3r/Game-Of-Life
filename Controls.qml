@@ -46,6 +46,10 @@ Rectangle {
         blinkText.start()
 
         generationButton.enabled = true
+        generation.state = ''
+
+        populationControl.opacity = 0.45
+        populationControl.enabled = false
     }
 
     function generationCompletion() {
@@ -88,10 +92,6 @@ Rectangle {
             root.generation()
         }
         else {
-            generation.state = ''
-
-            populationControl.opacity = 0.45
-            populationControl.enabled = false
 
             root.reset()
         }
