@@ -11,7 +11,10 @@ Rectangle {
     anchors.verticalCenter: parent.verticalCenter
     scale: 0
 
+    signal colorsGenerated(var colorArray)
+
     property int paletteIndex: -1
+    property int randomSelectionIndex: -1
 
     Behavior on scale {
         ScaleAnimator { duration: 160 }
@@ -92,6 +95,90 @@ Rectangle {
             expandingOne.scale = 1
             expandingOneBackgroundCompanion.scale = 1
         }
+    }
+
+    function generateRandomColors() {
+        var totalCells = rows * columns
+        var colorArray = []
+
+        for (var index = 0; index < totalCells; index++) {
+            switch (randomSelectionIndex) {
+            case -1:
+                var red = parseInt(Math.random() * 256)
+                var green = parseInt(Math.random() * 256)
+                var blue = parseInt(Math.random() * 256)
+
+                if (red < 128 && green < 128 && blue < 128) {
+                    var rgbSwitch = parseInt(Math.random() * 3)
+                    switch (rgbSwitch) {
+                    case 0: red = 255; break
+                    case 1: green = 255; break
+                    case 2: blue = 255; break
+                    }
+                }
+                break
+
+            case 0:
+                red = parseInt(Math.random() * 192) + 63
+                green = parseInt(Math.random() * 64)
+                blue = green // parseInt(Math.random() * 64)
+                break
+
+            case 1:
+                red = parseInt(Math.random() * 64)
+                green = parseInt(Math.random() * 192) + 63
+                blue = red // parseInt(Math.random() * 64)
+                break
+
+            case 2:
+                red = parseInt(Math.random() * 64)
+                green = red // parseInt(Math.random() * 64)
+                blue = parseInt(Math.random() * 192) + 63
+                break
+
+            case 3:
+                red = parseInt(Math.random() * 192) + 63
+                green = parseInt(Math.random() * 64)
+                blue = red // parseInt(Math.random() * 192) + 63
+                break
+
+            case 4:
+                red = parseInt(Math.random() * 192) + 63
+                green = red // parseInt(Math.random() * 192) + 63
+                blue = parseInt(Math.random() * 64)
+                break
+
+            case 5:
+                red = parseInt(Math.random() * 64)
+                green = parseInt(Math.random() * 192) + 63
+                blue = green // parseInt(Math.random() * 192) + 63
+                break
+            }
+
+            var redHex = red < 16 ? "0" + red.toString(16) : red.toString(16)
+            var greenHex = green < 16 ? "0" + green.toString(16) : green.toString(16)
+            var blueHex = blue < 16 ? "0" + blue.toString(16) : blue.toString(16)
+
+            var color = "#" + redHex + greenHex + blueHex
+            colorArray.splice(index, 0, color)
+        }
+
+        colorsGenerated(colorArray)
+    }
+
+    function selectRandomColor(index) {
+        redButton.switchState = index === 0
+        greenButton.switchState = index === 1
+        blueButton.switchState = index === 2
+        purpleButton.switchState = index === 3
+        yellowButton.switchState = index === 4
+        cyanButton.switchState = index === 5
+
+        randomSelectionIndex = index
+    }
+
+    function resetRandomIndex() {
+        randomSelectionIndex = -1
     }
 
     Rectangle {
@@ -255,53 +342,99 @@ Rectangle {
             anchors.topMargin: 0
             color: "transparent"
 
-            ColorButton {
-                id: toggleButton
+            Button {
+                id: setRandomColorsButton
                 x: 208
                 y: 25
-                dimension: 64
+                width: 64
+                height: 64
+                text: qsTr("Set")
+
+                background: Rectangle {
+                    color: "transparent"
+                    radius: width / 2
+                    scale: setRandomColorsButton.pressed ? 0.9 : 1
+                    border.width: 5
+                    border.color: "white"
+
+                    Behavior on scale {
+                        ScaleAnimator { duration: 60 }
+                    }
+                }
+
+                contentItem: Text {
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    font.pixelSize: setRandomColorsButton.pressed ? 21 : 26
+                    color: "white"
+                    text: setRandomColorsButton.text
+
+                    Behavior on font.pixelSize {
+                        NumberAnimation { duration: 80 }
+                    }
+                }
+
+                onClicked: generateRandomColors()
             }
 
             ColorButton {
-                x: 375
-                y: 125
+                id: redButton
+                x: 390
+                y: 208
                 tint: "red"
                 dimension: 64
+                onSwitchedOn: selectRandomColor(0)
+                onSwitchedOff: resetRandomIndex()
             }
 
             ColorButton {
-                x: 375
-                y: 262
+                id: greenButton
+                x: 365
+                y: 305
                 tint: "green"
                 dimension: 64
+                onSwitchedOn: selectRandomColor(1)
+                onSwitchedOff: resetRandomIndex()
             }
 
             ColorButton {
-                x: 291
-                y: 369
+                id: blueButton
+                x: 273
+                y: 378
                 tint: "blue"
                 dimension: 64
+                onSwitchedOn: selectRandomColor(2)
+                onSwitchedOff: resetRandomIndex()
             }
 
             ColorButton {
-                x: 125
-                y: 369
+                id: purpleButton
+                x: 147
+                y: 377
                 tint: "purple"
                 dimension: 64
+                onSwitchedOn: selectRandomColor(3)
+                onSwitchedOff: resetRandomIndex()
             }
 
             ColorButton {
-                x: 39
-                y: 262
+                id: yellowButton
+                x: 50
+                y: 305
                 tint: "yellow"
                 dimension: 64
+                onSwitchedOn: selectRandomColor(4)
+                onSwitchedOff: resetRandomIndex()
             }
 
             ColorButton {
-                x: 39
-                y: 125
+                id: cyanButton
+                x: 27
+                y: 208
                 tint: "cyan"
                 dimension: 64
+                onSwitchedOn: selectRandomColor(5)
+                onSwitchedOff: resetRandomIndex()
             }
         }
     }

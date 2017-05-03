@@ -25,9 +25,11 @@ Rectangle {
 
     property var grid: []
     property var population: []
+    property var shades: []
 
     property int generationProcessIndex: 0
     property int resetProcessIndex: 0
+    property int colorGenerationIndex: 0
 
     function generateWorld() {
         var index = 0
@@ -251,6 +253,22 @@ Rectangle {
         }
 
         incrementCycle()
+    }
+
+    function colorGenerationProcess() {
+        for (var index = colorGenerationIndex; index < grid.length; index += columns) {
+            grid[index].color = shades[index]
+        }
+
+        colorGenerationIndex++
+
+        if (colorGenerationIndex < columns) {
+            colorGeneratorTimer.start()
+        }
+        else {
+            // Generation Comletion
+            colorGenerationIndex = 0
+        }
     }
 
     function checkeredGeneration() {
@@ -543,6 +561,14 @@ Rectangle {
         running: false
         interval: 88
         onTriggered: resetCompletion()
+    }
+
+    Timer {
+        id: colorGeneratorTimer
+        repeat: false
+        running: false
+        interval: columns < 40 ? 30 : 10
+        onTriggered: colorGenerationProcess()
     }
 
     Rectangle {
@@ -1142,6 +1168,11 @@ Rectangle {
         id: colorPalette
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
+
+        onColorsGenerated: {
+            shades = colorArray
+            colorGenerationProcess()
+        }
     }
 
 

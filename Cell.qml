@@ -14,4 +14,8 @@ Rectangle {
         enabled: animate
         ScaleAnimator { duration: 80 }
     }
+
+    Behavior on color {
+        ColorAnimation { duration: 80 }
+    }
 }

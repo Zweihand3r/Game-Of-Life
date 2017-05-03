@@ -13,7 +13,7 @@ Button {
 
     property string tint: "black"
     property int dimension: 64
-    property bool switchState: true
+    property bool switchState: false
     property bool connected: false
 
     background: Rectangle {
