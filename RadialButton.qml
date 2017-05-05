@@ -14,6 +14,8 @@ Rectangle {
 
     signal pressed()
 
+    Behavior on color { ColorAnimation { duration: 120 } }
+
     Rectangle {
         id: rootground
         width: 105
@@ -39,6 +41,7 @@ Rectangle {
         horizontalAlignment: Text.AlignHCenter
         rotation: -45
         text: title
+        wrapMode: Text.WordWrap
         font.pixelSize: 21
         color: "white"
 

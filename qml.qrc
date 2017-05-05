@@ -17,5 +17,8 @@
         <file>ColorPalette.qml</file>
         <file>ColorButton.qml</file>
         <file>RadialButton.qml</file>
+        <file>Colors.js</file>
+        <file>RuleSetButton.qml</file>
+        <file>RuleSets.qml</file>
     </qresource>
 </RCC>

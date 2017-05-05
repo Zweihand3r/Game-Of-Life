@@ -1,6 +1,8 @@
 import QtQuick 2.6
 import QtQuick.Controls 2.0
 
+import "./Colors.js" as Color
+
 Rectangle {
     id: root
     width: 1920
@@ -733,7 +735,7 @@ Rectangle {
             y: 138
             width: 34
             height: 56
-            color: "red"
+            color: Color.redTint
             text: "X"
             scale: 0
             horizontalAlignment: Text.AlignHCenter
@@ -890,7 +892,7 @@ Rectangle {
             width: 16
             height: 16
             radius: 8
-            color: colorPaletteHovered ? "#3355aa" : "white"
+            color: colorPaletteHovered ? Color.blueTint : "white"
 
             Behavior on color {
                 ColorAnimation { duration: 120 }
@@ -903,7 +905,7 @@ Rectangle {
             width: 16
             height: 16
             radius: 8
-            color: colorPaletteHovered ? "#33cc55" : "white"
+            color: colorPaletteHovered ? Color.greenTint : "white"
 
             Behavior on color {
                 ColorAnimation { duration: 120 }
@@ -916,7 +918,7 @@ Rectangle {
             width: 16
             height: 16
             radius: 8
-            color: colorPaletteHovered ? "#cc5533" : "white"
+            color: colorPaletteHovered ? Color.redTint : "white"
 
             Behavior on color {
                 ColorAnimation { duration: 120 }

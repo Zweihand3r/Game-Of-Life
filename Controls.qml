@@ -262,8 +262,8 @@ Rectangle {
 
     Rectangle {
         id: populationControl
-        x: 865
-        y: 266
+        x: 823
+        y: 357
         width: 400
         height: 448
         color: "transparent"
@@ -293,8 +293,8 @@ Rectangle {
 
     Rectangle {
         id: generation
-        x: 233
-        y: 266
+        x: 191
+        y: 357
         width: 476
         height: 448
         color: "transparent"
@@ -662,8 +662,8 @@ Rectangle {
 
     CustomSwitch {
         id: animateSwitch
-        x: 1419
-        y: 272
+        x: 1377
+        y: 363
         checked: true
         font.pixelSize: 25
         text: qsTr("Animate")
@@ -673,8 +673,8 @@ Rectangle {
 
     Text {
         id: speedText
-        x: 1456
-        y: 529
+        x: 1414
+        y: 620
         width: 100
         height: 39
         color: "#ffffff"
@@ -684,10 +684,16 @@ Rectangle {
         font.pixelSize: 25
     }
 
+    RuleSets {
+        id: ruleSets
+        x: 192
+        y: 86
+    }
+
     CustomDial {
         id: speedDial
-        x: 1424
-        y: 359
+        x: 1382
+        y: 450
         dimension: 164
         from: 100
         to: 1000
@@ -695,6 +701,7 @@ Rectangle {
 
         onValueChanged: root.intervalGenerated(parseInt(value))
     }
+
 
 
     Component.onCompleted: {

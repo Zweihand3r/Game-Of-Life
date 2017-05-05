@@ -2,6 +2,8 @@ import QtQuick 2.6
 import QtQuick.Controls 2.0
 import QtGraphicalEffects 1.0
 
+import "./Colors.js" as Color
+
 Rectangle {
     id: root
     width: 480
@@ -83,6 +85,8 @@ Rectangle {
             expandingOne.opacity = 0
             expandingOne.scale = 0.5
             expandingOneBackgroundCompanion.scale = 0.5
+
+            generateDefaultColors() // Maybe moved somewhere else later
             break
 
         case 0:
@@ -95,6 +99,17 @@ Rectangle {
             expandingOne.scale = 1
             expandingOneBackgroundCompanion.scale = 1
         }
+    }
+
+    function generateDefaultColors() {
+        var totalCells = rows * columns
+        var colorArray = []
+
+        for (var index = 0; index < totalCells; index++) {
+            colorArray.splice(index, 0, "#FFFFFF")
+        }
+
+        colorsGenerated(colorArray)
     }
 
     function generateRandomColors() {
@@ -231,9 +246,8 @@ Rectangle {
                 hoverEnabled: true
 
                 onEntered: {
-                    var redTint = "#DD4332"
-                    innerWorld.border.color = redTint
-                    innerCircle.color = redTint
+                    innerWorld.border.color = Color.redTint
+                    innerCircle.color = Color.redTint
 
                     defaultRadial.color = "black"
                     randomRadial.color = "black"
@@ -243,7 +257,8 @@ Rectangle {
                     innerWorld.border.color = "white"
                     innerCircle.color = "transparent"
 
-                    transparetor.start()
+                    defaultRadial.color = "transparent"
+                    randomRadial.color = "transparent"
                 }
 
                 onClicked: dismissPalette()
@@ -381,7 +396,7 @@ Rectangle {
                 id: redButton
                 x: 390
                 y: 208
-                tint: "red"
+                tint: Color.redTint
                 dimension: 64
                 onSwitchedOn: selectRandomColor(0)
                 onSwitchedOff: resetRandomIndex()
@@ -391,7 +406,7 @@ Rectangle {
                 id: greenButton
                 x: 365
                 y: 305
-                tint: "green"
+                tint: Color.greenTint
                 dimension: 64
                 onSwitchedOn: selectRandomColor(1)
                 onSwitchedOff: resetRandomIndex()
@@ -401,7 +416,7 @@ Rectangle {
                 id: blueButton
                 x: 273
                 y: 378
-                tint: "blue"
+                tint: Color.blueTint
                 dimension: 64
                 onSwitchedOn: selectRandomColor(2)
                 onSwitchedOff: resetRandomIndex()
@@ -411,7 +426,7 @@ Rectangle {
                 id: purpleButton
                 x: 147
                 y: 377
-                tint: "purple"
+                tint: Color.purpleTint
                 dimension: 64
                 onSwitchedOn: selectRandomColor(3)
                 onSwitchedOff: resetRandomIndex()
@@ -421,7 +436,7 @@ Rectangle {
                 id: yellowButton
                 x: 50
                 y: 305
-                tint: "yellow"
+                tint: Color.yellowTint
                 dimension: 64
                 onSwitchedOn: selectRandomColor(4)
                 onSwitchedOff: resetRandomIndex()
@@ -431,7 +446,7 @@ Rectangle {
                 id: cyanButton
                 x: 27
                 y: 208
-                tint: "cyan"
+                tint: Color.cyanTinit
                 dimension: 64
                 onSwitchedOn: selectRandomColor(5)
                 onSwitchedOff: resetRandomIndex()
