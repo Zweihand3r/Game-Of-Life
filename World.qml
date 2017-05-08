@@ -25,7 +25,6 @@ Rectangle {
     property bool animate: true
 
     property string inputString: "0"
-    property int generationModeIndex: 0
 
     property var grid: []
     property var selectorGrid: []
@@ -181,17 +180,6 @@ Rectangle {
 
         setAnimation(animate)
         controls.resetCompletion()
-    }
-
-    function populateWorld() {
-        switch (generationModeIndex) {
-        case 0: randomGeneration(); break
-        case 1: checkeredGeneration(); break
-        case 2: stripeGeneration(); break
-        case 3: gliderGunGeneration(0); break
-        }
-
-        console1.write(18 * (columns + 1) + " " + root.width)
     }
 
     function incrementCycle() {
@@ -390,133 +378,6 @@ Rectangle {
         }
     }
 
-    function checkeredGeneration() {
-        var checkered = true
-
-        for (var index = 0; index < population.length; index++) {
-            var cell = grid[index]
-
-            cell.occupied = checkered
-            population[index] = checkered
-
-            if (index % columns !== (columns - 1) && columns % 2 == 0) {
-                checkered = !checkered
-            }
-
-            if (index % columns !== (columns) && columns % 2 == 1) {
-                checkered = !checkered
-            }
-        }
-    }
-
-    function randomGeneration() {
-        for (var index = 0; index < population.length; index++) {
-            var cell = grid[index]
-
-            if (Math.random() > 1/3) {
-                cell.occupied = false
-                population[index] = false
-            }
-            else {
-                cell.occupied = true
-                population[index] = true
-            }
-            //            console1.write(index + " " + (population[index] ? "true" : "false"))
-        }
-    }
-
-    function stripeGeneration() {
-        var striped = (Math.random() * 4) < 2 ? true : false
-
-        for (var index = 0; index < population.length; index++) {
-            var cell = grid[index]
-
-            cell.occupied = striped
-            population[index] = striped
-
-            if (index % columns !== (columns) && columns % 2 == 0) {
-                striped = !striped
-            }
-
-            if (index % columns !== (columns - 1) && columns % 2 == 1) {
-                striped = !striped
-            }
-        }
-    }
-
-    function gliderGunGeneration(index) {
-        if (rows < 8 || columns < 36) {
-            error.start()
-            return
-        }
-
-        for (var x = 0; x < grid.length; x++) {
-            grid[x].occupied = false
-        }
-
-        // First line
-        grid[index + 24].occupied = true
-
-        // Second line
-        index += columns
-        grid[index + 22].occupied = true
-        grid[index + 24].occupied = true
-
-        // Third line
-        index += columns
-        grid[index + 12].occupied = true
-        grid[index + 13].occupied = true
-        grid[index + 20].occupied = true
-        grid[index + 21].occupied = true
-        grid[index + 34].occupied = true
-        grid[index + 35].occupied = true
-
-        // Next line
-        index += columns
-        grid[index + 11].occupied = true
-        grid[index + 15].occupied = true
-        grid[index + 20].occupied = true
-        grid[index + 21].occupied = true
-        grid[index + 34].occupied = true
-        grid[index + 35].occupied = true
-
-        // Next line
-        index += columns
-        grid[index].occupied = true
-        grid[index + 1].occupied = true
-        grid[index + 10].occupied = true
-        grid[index + 16].occupied = true
-        grid[index + 20].occupied = true
-        grid[index + 21].occupied = true
-
-        // Next line
-        index += columns
-        grid[index].occupied = true
-        grid[index + 1].occupied = true
-        grid[index + 10].occupied = true
-        grid[index + 14].occupied = true
-        grid[index + 16].occupied = true
-        grid[index + 17].occupied = true
-        grid[index + 22].occupied = true
-        grid[index + 24].occupied = true
-
-        // Next line
-        index += columns
-        grid[index + 10].occupied = true
-        grid[index + 16].occupied = true
-        grid[index + 24].occupied = true
-
-        // Next line
-        index += columns
-        grid[index + 11].occupied = true
-        grid[index + 15].occupied = true
-
-        // Next line
-        index += columns
-        grid[index + 12].occupied = true
-        grid[index + 13].occupied = true
-    }
-
     function setAnimation(animationStatus) {
         for (var index = 0; index < grid.length; index++) {
             var cell = grid[index]
@@ -697,116 +558,6 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
     }
 
-    Console {
-        id: console1
-        anchors.horizontalCenter: parent.horizontalCenter
-
-        consoleVisibility: debug
-        pauseLogs: false
-
-        onTextEntered: {
-            inputString = text
-
-            switch (text.split(" ")[0]) {
-            case "random":
-                if (text.split(" ")[1] === "int") {
-                    var num = parseInt(text.split(" ")[2])
-                    write("(int) = " + parseInt(Math.random() * num + 1))
-                }
-                else {
-                    num = text.split(" ")[1]
-                    write("= " + Math.random() * num)
-                }
-                break
-
-            case "populate":
-                var index = text.split(" ")[1]
-                grid[index].occupied = true
-                console1.write("Cell index " + index + " populated")
-                break
-
-            case "nuke":
-                for (index = 0; index < population.length; index++) {
-                    var cell = grid[index]
-
-                    cell.occupied = false
-                    population[index] = false
-                }
-                console1.write("Grid nuked !")
-                break
-
-            case "clear":
-                console1.clear()
-                break
-
-            case "pauseLogs":
-                switch (text.split(" ")[1]) {
-                case "true":
-                    write("Log feed is paused")
-                    pauseLogs = true
-                    break
-
-                case "false":
-                    pauseLogs = false
-                    write("Log feed is active")
-                    break
-
-                default:
-                    write("Invalid parameter. Use true/false")
-                    break
-                }
-                break
-
-            case "background":
-                var color = text.split(" ")[1]
-                switch (color) {
-                case "transparent":
-                case "white":
-                case "black":
-                    backgroundColor = color
-                    console1.write("Changed background color to " + color)
-                    break
-
-                default:
-                    console1.write("Invalid color. Use transparent, white or black")
-                }
-                break
-
-            case "advance":
-                for (index = 0; index < population.length; index++) {
-                    cell = grid[index]
-                    population[index] = cell.occupied
-                }
-                incrementCycle();
-                console1.write("Cycle incremented")
-                break
-
-            case "help":
-                var bypassPause = false
-                if (pauseLogs) {
-                    pauseLogs = false
-                    bypassPause = true
-                }
-
-                write("random *int <int>")
-                write("populate <int>")
-                write("nuke")
-                write("clear")
-                write("pauseLogs <bool>")
-                write("background <color> | color: transparent, white, black")
-
-                if (bypassPause) {
-                    pauseLogs = true
-                }
-                break
-
-            default:
-                write("Unrecognised command. Type help to display commands")
-                break
-            }
-        }
-    }
-
 
     Rectangle {
         id: sidePanel
@@ -818,7 +569,7 @@ Rectangle {
         clip: true
 
         Behavior on x {
-            NumberAnimation { duration: 240; easing: Easing.OutCurve }
+            NumberAnimation { duration: 240; easing.type: Easing.OutCurve }
         }
 
         Rectangle {
@@ -920,7 +671,7 @@ Rectangle {
             }
         }
 
-        // Pay
+        // Play
 
         Text {
             id: playText
@@ -1276,8 +1027,6 @@ Rectangle {
         onColumnSelected: columns = column
         onReset: recycleWorld()
         onGeneration: generateWorld()
-        onPopulate: populateWorld()
-        onGenerationIndexSelected: generationModeIndex = index
         onAnimationEnabled: { setAnimation(status); animate = status }
         onIntervalGenerated: cycleInterval = interval
         onSpacingSelected: gridSpacing = spacing
@@ -1301,6 +1050,5 @@ Rectangle {
         from: "red"
         to: "black"
         duration: 640
-        easing: Easing.InCurve
     }
 }

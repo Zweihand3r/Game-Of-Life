@@ -21,8 +21,6 @@ Rectangle {
     signal columnSelected(int column)
     signal generation()
     signal reset()
-    signal populate()
-    signal generationIndexSelected(int index)
     signal animationEnabled(bool status)
     signal intervalGenerated(int interval)
     signal spacingSelected(int spacing)
@@ -236,11 +234,11 @@ Rectangle {
     }
 
     Behavior on opacity {
-        OpacityAnimator { duration: 160; easing: Easing.InQuad }
+        OpacityAnimator { duration: 160; easing.type: Easing.InQuad }
     }
 
     Behavior on scale {
-        ScaleAnimator { duration: 160; easing: Easing.InQuad }
+        ScaleAnimator { duration: 160; easing.type: Easing.InQuad }
     }
 
     Timer {
@@ -260,36 +258,11 @@ Rectangle {
         opacity: 0.86
     }
 
-    Rectangle {
+    PopulationControl {
         id: populationControl
-        x: 823
+        x: 747
         y: 357
-        width: 400
-        height: 448
-        color: "transparent"
-
-        CustomButton {
-            id: populateButton
-            y: 108
-            width: 400
-            height: 70
-            text: "Populate"
-            onClicked: root.populate()
-        }
-
-        CustomComboBox {
-            id: customComboBox
-            width: 400
-            height: 70
-            model: ["Random", "Checkered", "Striped", "Glider Gun"]
-            onActivated: root.generationIndexSelected(currentIndex)
-        }
-
-        Behavior on opacity {
-            OpacityAnimator { duration: 160; easing: Easing.InQuad }
-        }
     }
-
 
     Rectangle {
         id: generation
@@ -654,7 +627,7 @@ Rectangle {
                 NumberAnimation {
                     properties: "y, height"
                     duration: 320
-                    easing: Easing.InQuad
+                    easing.type: Easing.InQuad
                 }
             }
         ]

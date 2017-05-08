@@ -49,16 +49,15 @@ Rectangle {
         end: Qt.point(1032, 0)
 
         gradient: Gradient {
-            GradientStop { position: 0.025; color: Color.transparent }
-            GradientStop { position: 0.1; color: Color.black }
-            GradientStop { position: 0.9; color: Color.black }
-            GradientStop { position: 0.975; color: Color.transparent }
+            GradientStop { position: 0.0; color: Color.transparent }
+            GradientStop { position: 0.05; color: Color.black }
+            GradientStop { position: 0.95; color: Color.black }
+            GradientStop { position: 1.0; color: Color.transparent }
         }
     }
 
     Item {
         id: flickabeFrame
-        x: 30
         height: 172
         width: 1032
         clip: true
@@ -68,9 +67,10 @@ Rectangle {
         }
 
         Flickable {
-            x: 112
+            x: 52
+            y: 0
             height: 172
-            width: 808
+            width: 928
             contentHeight: 172
             contentWidth: 2504
 
@@ -206,11 +206,5 @@ Rectangle {
                 onSwitchedOn: selectRule(11)
             }
         }
-    }
-
-    Button {
-        id: leftIndicator
-        height: 172
-        width: 100
     }
 }

@@ -21,5 +21,7 @@
         <file>RuleSetButton.qml</file>
         <file>RuleSets.qml</file>
         <file>SelectorCell.qml</file>
+        <file>PopulationControl.qml</file>
+        <file>PopulationDelagate.qml</file>
     </qresource>
 </RCC>
