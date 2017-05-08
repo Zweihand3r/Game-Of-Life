@@ -9,6 +9,8 @@ Rectangle {
     height: 980
     color: "black"
 
+    onColumnsChanged: console.log("Columns changed to : " + columns)
+
     property bool debug: false
 
     property bool worldActive: false
@@ -26,8 +28,12 @@ Rectangle {
     property int generationModeIndex: 0
 
     property var grid: []
+    property var selectorGrid: []
     property var population: []
     property var shades: []
+
+    property var survivalRules: [2, 3]
+    property var growthRules: [3]
 
     property int generationProcessIndex: 0
     property int resetProcessIndex: 0
@@ -75,6 +81,39 @@ Rectangle {
         }
     }
 
+    function toggleSelector(toggle) {
+        if (toggle) {
+            var index = 0
+            var rowPosition = 0
+            var colPosition = 0
+
+            var componentId = "SelectorCell.qml"
+
+            for (var row = 0; row < rows; row++) {
+                for (var col = 0; col < columns; col++) {
+                    var component = Qt.createComponent(componentId)
+                    var selectorCell = component.createObject(worldGrid, { "x":rowPosition, "y":colPosition, "gridIndex": index })
+
+                    selectorGrid.splice(index, 0, selectorCell)
+
+                    index++
+                    rowPosition += debug ? 32 + gridSpacing : 16 + gridSpacing
+                }
+
+                colPosition += debug ? 32 + gridSpacing : 16 + gridSpacing
+                rowPosition = 0
+            }
+        }
+        else {
+            for (index = 0; index < grid.length; index++) {
+                selectorCell = selectorGrid[index]
+                selectorCell.destroy()
+            }
+
+            selectorGrid = []
+        }
+    }
+
     function generationProcess() {
         for (var index = generationProcessIndex; index < grid.length; index += columns) {
             grid[index].occupied = true
@@ -88,6 +127,7 @@ Rectangle {
         else {
             // Generation completes here
             worldActive = true
+            toggleSelector(true)
 
             generationProcessIndex = 0
             setAnimation(animate)
@@ -98,6 +138,7 @@ Rectangle {
 
     function recycleWorld() {
         worldActive = false
+        toggleSelector(false)
 
         if (playActive) {
             playTextTransitionPhaseI.start()
@@ -154,6 +195,82 @@ Rectangle {
     }
 
     function incrementCycle() {
+        var newGeneration = []
+
+        for (var index = 0; index < population.length; index++) {
+            var survivalIndex = 0
+            var growthIndex = 0
+            var counter = false
+
+            if (hasTopNeighbour(index)) {
+                survivalIndex++
+                growthIndex++
+            }
+
+            if (hasTopRightNeighbour(index)) {
+                survivalIndex++
+                growthIndex++
+            }
+
+            if (hasRightNeighbour(index)) {
+                survivalIndex++
+                growthIndex++
+            }
+
+            if (hasBottomRightNeighbour(index)) {
+                survivalIndex++
+                growthIndex++
+            }
+
+            if (hasBottomNeighbour(index)) {
+                survivalIndex++
+                growthIndex++
+            }
+
+            if (hasBottomLeftNeighbour(index)) {
+                survivalIndex++
+                growthIndex++
+            }
+
+            if (hasLeftNeighbour(index)) {
+                survivalIndex++
+                growthIndex++
+            }
+
+            if (hasTopLeftNeighbour(index)) {
+                survivalIndex++
+                growthIndex++
+            }
+
+            if (population[index]) {
+                for (var index2 in survivalRules) {
+                    if (survivalIndex === survivalRules[index2]) {
+                        counter = true
+                        break
+                    }
+                }
+            }
+            else {
+                for (index2 in growthRules) {
+                    if (growthIndex === growthRules[index2]) {
+                        counter = true
+                        break
+                    }
+                }
+            }
+
+            newGeneration.splice(index, 0, counter)
+
+            population[index] = newGeneration[index]
+        }
+
+        for (index = 0; index < newGeneration.length; index++) {
+            var cellInTransition = grid[index]
+            cellInTransition.occupied = newGeneration[index]
+        }
+    }
+
+    function incrementCycleOld() {
         var newGeneration = []
 
         for (var index = 0; index < population.length; index++) {

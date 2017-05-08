@@ -98,6 +98,8 @@ Rectangle {
             expandingOne.opacity = 1
             expandingOne.scale = 1
             expandingOneBackgroundCompanion.scale = 1
+
+            generateRandomColors()
         }
     }
 
@@ -190,10 +192,12 @@ Rectangle {
         cyanButton.switchState = index === 5
 
         randomSelectionIndex = index
+        generateRandomColors()
     }
 
     function resetRandomIndex() {
         randomSelectionIndex = -1
+        generateRandomColors()
     }
 
     Rectangle {
@@ -357,40 +361,40 @@ Rectangle {
             anchors.topMargin: 0
             color: "transparent"
 
-            Button {
-                id: setRandomColorsButton
-                x: 208
-                y: 25
-                width: 64
-                height: 64
-                text: qsTr("Set")
+//            Button {
+//                id: setRandomColorsButton
+//                x: 208
+//                y: 25
+//                width: 64
+//                height: 64
+//                text: qsTr("Set")
 
-                background: Rectangle {
-                    color: "transparent"
-                    radius: width / 2
-                    scale: setRandomColorsButton.pressed ? 0.9 : 1
-                    border.width: 5
-                    border.color: "white"
+//                background: Rectangle {
+//                    color: "transparent"
+//                    radius: width / 2
+//                    scale: setRandomColorsButton.pressed ? 0.9 : 1
+//                    border.width: 5
+//                    border.color: "white"
 
-                    Behavior on scale {
-                        ScaleAnimator { duration: 60 }
-                    }
-                }
+//                    Behavior on scale {
+//                        ScaleAnimator { duration: 60 }
+//                    }
+//                }
 
-                contentItem: Text {
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                    font.pixelSize: setRandomColorsButton.pressed ? 21 : 26
-                    color: "white"
-                    text: setRandomColorsButton.text
+//                contentItem: Text {
+//                    horizontalAlignment: Text.AlignHCenter
+//                    verticalAlignment: Text.AlignVCenter
+//                    font.pixelSize: setRandomColorsButton.pressed ? 21 : 26
+//                    color: "white"
+//                    text: setRandomColorsButton.text
 
-                    Behavior on font.pixelSize {
-                        NumberAnimation { duration: 80 }
-                    }
-                }
+//                    Behavior on font.pixelSize {
+//                        NumberAnimation { duration: 80 }
+//                    }
+//                }
 
-                onClicked: generateRandomColors()
-            }
+//                onClicked: generateRandomColors()
+//            }
 
             ColorButton {
                 id: redButton

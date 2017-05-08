@@ -686,8 +686,10 @@ Rectangle {
 
     RuleSets {
         id: ruleSets
-        x: 192
-        y: 86
+        x: 191
+        y: 125
+        width: 1032
+        height: 172
     }
 
     CustomDial {

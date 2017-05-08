@@ -16,6 +16,7 @@ Rectangle {
     }
 
     Behavior on color {
+        enabled: animate
         ColorAnimation { duration: 80 }
     }
 }

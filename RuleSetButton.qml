@@ -8,11 +8,16 @@ Rectangle {
     height: 172
     width: 172
     color: Color.transparent
+    state: 'title'
+    clip: true
+
+    signal switchedOn()
 
     property bool selected: false
 
-    property string birthIndexes: "0"
-    property string survivalIndexes: "0"
+    property alias title: titleText.text
+    property string birthIndexes: "0000"
+    property string survivalIndexes: "0000"
 
     Rectangle {
         id: borders
@@ -20,7 +25,7 @@ Rectangle {
         color: Color.transparent
         border.color: Color.white
         border.width: 2
-        radius: 16
+        radius: 32
 
         Behavior on scale {
             ScaleAnimator { duration: 120 }
@@ -34,7 +39,7 @@ Rectangle {
         height: 162
         width: 162
         color: selected ? Color.white : Color.transparent
-        radius: 10
+        radius: 28
 
         Behavior on color {
             ColorAnimation { duration: 120 }
@@ -46,7 +51,7 @@ Rectangle {
         x: 8
         y: 8
         width: 156
-        height: 72
+        height: 93
         text: qsTr("Text")
         color: selected ? Color.black : Color.white
         wrapMode: Text.WordWrap
@@ -60,8 +65,9 @@ Rectangle {
     }
 
     Rectangle {
+        id: rectangle
         x: 12
-        y: 82
+        y: 107
         width: 148
         height: 2
         radius: 1
@@ -71,15 +77,14 @@ Rectangle {
     Text {
         id: birthText
         x: 8
-        y: 90
+        y: 108
         width: 156
         height: 35
-        text: "Birth - " + birthIndexes
+        text: "B " + birthIndexes
         color: selected ? Color.black : Color.white
-        font.italic: true
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
-        font.pixelSize: 20
+        font.pixelSize: 18
 
         Behavior on color {
             ColorAnimation { duration: 120 }
@@ -89,15 +94,14 @@ Rectangle {
     Text {
         id: survivalText
         x: 8
-        y: 125
+        y: 133
         width: 156
         height: 35
-        text: "Survival - " + survivalIndexes
+        text: "S " + survivalIndexes
         color: selected ? Color.black : Color.white
-        font.italic: true
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
-        font.pixelSize: 20
+        font.pixelSize: 18
 
         Behavior on color {
             ColorAnimation { duration: 120 }
@@ -109,13 +113,61 @@ Rectangle {
         hoverEnabled: true
 
         onEntered: {
-            borders.scale = 1.1
+//            borders.scale = 1.1
+            root.state = ''
         }
 
         onExited: {
-            borders.scale = 1
+//            borders.scale = 1
+            root.state = 'title'
         }
 
-        onClicked: selected = !selected
+        onClicked: {
+            selected = true
+            switchedOn()
+        }
     }
+
+    states: [
+        State {
+            name: "title"
+
+            PropertyChanges {
+                target: rectangle
+                x: 12
+                y: 173
+                opacity: 0
+            }
+
+            PropertyChanges {
+                target: birthText
+                x: 8
+                y: 186
+                opacity: 0
+            }
+
+            PropertyChanges {
+                target: survivalText
+                x: 8
+                y: 211
+                opacity: 0
+            }
+
+            PropertyChanges {
+                target: titleText
+                x: 8
+                y: 40
+                font.pixelSize: 34
+            }
+        }
+    ]
+
+    transitions: [
+        Transition {
+            NumberAnimation {
+                properties: "x, y, opacity, font.pixelSize"
+                duration: 120
+            }
+        }
+    ]
 }

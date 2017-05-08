@@ -20,5 +20,6 @@
         <file>Colors.js</file>
         <file>RuleSetButton.qml</file>
         <file>RuleSets.qml</file>
+        <file>SelectorCell.qml</file>
     </qresource>
 </RCC>

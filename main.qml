@@ -15,6 +15,10 @@ ApplicationWindow {
     // Populate Pulsars
     // Colrs
     // Colors based on age of cell. 1 cycle alive blue, 2 cycles alive green, 3 cycles alive red
+    // Cycle counter and population counter below play. Maybe even graph between cycle and population
+    //
+    // PUT MOAR SHAPES
+    //
 
     property int initialRowCount: 32
     property int initialColumnCount: 64
