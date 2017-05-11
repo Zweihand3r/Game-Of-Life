@@ -14,10 +14,23 @@ Rectangle {
 
     function generatePopulation() {
         switch (previousSelectionIndex) {
-        case 0: randomGeneration(); break
-        case 1: checkeredGeneration(); break
-        case 2: stripeGeneration(); break
-        case 3: gliderGunGeneration(0); break
+        case 0: clearFillGeneration(); break
+        case 1: reverseGeneration(); break
+        case 2: randomGeneration(); break
+        case 3: checkeredGeneration(); break
+        case 4: stripeGeneration(); break
+        case 5: gliderGunGeneration(0); break
+        }
+    }
+
+    function clearFillGeneration() {
+
+    }
+
+    function reverseGeneration() {
+        for (var index = 0; index < population.length; index++) {
+            grid[index].occupied = !grid[index].occupied
+            population[index] = !population[index]
         }
     }
 
@@ -41,10 +54,12 @@ Rectangle {
     }
 
     function randomGeneration() {
+        var seedKinda = Math.random() * 4 + 1
+
         for (var index = 0; index < population.length; index++) {
             var cell = grid[index]
 
-            if (Math.random() > 1/3) {
+            if (Math.random() > 1/seedKinda) {
                 cell.occupied = false
                 population[index] = false
             }
@@ -204,7 +219,9 @@ Rectangle {
 
                 model: ListModel {
                     id: listModel
-                    ListElement { name: "Random"; selection: true }
+                    ListElement { name: "Fill || Clear"; selection: true }
+                    ListElement { name: "Reverse"; selection: false }
+                    ListElement { name: "Random"; selection: false }
                     ListElement { name: "Checkered"; selection: false }
                     ListElement { name: "Striped"; selection: false }
                     ListElement { name: "Glider Gun"; selection: false }

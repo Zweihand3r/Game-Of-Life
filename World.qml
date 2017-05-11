@@ -383,8 +383,6 @@ Rectangle {
             var cell = grid[index]
             cell.animate = animationStatus
         }
-
-        console1.write(animate)
     }
 
     function hasTopNeighbour(index) {
