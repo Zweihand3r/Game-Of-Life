@@ -19,12 +19,53 @@ Rectangle {
         case 2: randomGeneration(); break
         case 3: checkeredGeneration(); break
         case 4: stripeGeneration(); break
-        case 5: gliderGunGeneration(0); break
+        case 5: gliderGunGeneration(24); break
+        }
+    }
+
+    function previewAction() {
+        for (var index = 0; index < population.length; index++) {
+            grid[index].occupied = false
+        }
+
+        previewMode = true
+        menuActive = false
+
+        transitionFromMenu.start()
+        controls.dismiss()
+        sidePanel.x = 1920
+
+        donePreviewButton.opacity = 1
+        donePreviewButton.scale = 1
+    }
+
+    function generatePreview() {
+        switch (previousSelectionIndex) {
+        case 5: gliderGunPreview(currentHoveredIndex); break
+        }
+    }
+
+    function setFromPreview() {
+        switch (previousSelectionIndex) {
+        case 5: gliderGunGeneration(currentHoveredIndex); break
         }
     }
 
     function clearFillGeneration() {
+        // If populationCount present change this
+        var populate = true
 
+        for (var index = 0; index < population.length; index++) {
+            if (population[index]) {
+                populate = false
+                break
+            }
+        }
+
+        for (index = 0; index < population.length; index++) {
+            grid[index].occupied = populate
+            population[index] = populate
+        }
     }
 
     function reverseGeneration() {
@@ -90,15 +131,90 @@ Rectangle {
         }
     }
 
+    function gliderGunPreview(index) {
+        index -= 24
+
+        try {
+            // First line
+            selectorGrid[index + 24].occupied = true
+
+            // Second line
+            index += columns
+            selectorGrid[index + 22].occupied = true
+            selectorGrid[index + 24].occupied = true
+
+            // Third line
+            index += columns
+            selectorGrid[index + 12].occupied = true
+            selectorGrid[index + 13].occupied = true
+            selectorGrid[index + 20].occupied = true
+            selectorGrid[index + 21].occupied = true
+            selectorGrid[index + 34].occupied = true
+            selectorGrid[index + 35].occupied = true
+
+            // Next line
+            index += columns
+            selectorGrid[index + 11].occupied = true
+            selectorGrid[index + 15].occupied = true
+            selectorGrid[index + 20].occupied = true
+            selectorGrid[index + 21].occupied = true
+            selectorGrid[index + 34].occupied = true
+            selectorGrid[index + 35].occupied = true
+
+            // Next line
+            index += columns
+            selectorGrid[index].occupied = true
+            selectorGrid[index + 1].occupied = true
+            selectorGrid[index + 10].occupied = true
+            selectorGrid[index + 16].occupied = true
+            selectorGrid[index + 20].occupied = true
+            selectorGrid[index + 21].occupied = true
+
+            // Next line
+            index += columns
+            selectorGrid[index].occupied = true
+            selectorGrid[index + 1].occupied = true
+            selectorGrid[index + 10].occupied = true
+            selectorGrid[index + 14].occupied = true
+            selectorGrid[index + 16].occupied = true
+            selectorGrid[index + 17].occupied = true
+            selectorGrid[index + 22].occupied = true
+            selectorGrid[index + 24].occupied = true
+
+            // Next line
+            index += columns
+            selectorGrid[index + 10].occupied = true
+            selectorGrid[index + 16].occupied = true
+            selectorGrid[index + 24].occupied = true
+
+            // Next line
+            index += columns
+            selectorGrid[index + 11].occupied = true
+            selectorGrid[index + 15].occupied = true
+
+            // Next line
+            index += columns
+            selectorGrid[index + 12].occupied = true
+            selectorGrid[index + 13].occupied = true
+        }
+        catch (error) {
+            console.log(error + " at baseIndex - " + index)
+        }
+    }
+
     function gliderGunGeneration(index) {
-        if (rows < 8 || columns < 36) {
+        if ((rows < 8 || columns < 36) && !previewMode) {
             error.start()
             return
         }
 
-        for (var x = 0; x < grid.length; x++) {
-            grid[x].occupied = false
+        if (!previewMode) {
+            for (var x = 0; x < grid.length; x++) {
+                grid[x].occupied = false
+            }
         }
+
+        index -= 24
 
         // First line
         grid[index + 24].occupied = true
@@ -163,15 +279,6 @@ Rectangle {
         grid[index + 13].occupied = true
     }
 
-    CustomButton {
-        id: populateButton
-        y: 378
-        width: 476
-        height: 70
-        text: "Populate"
-        onClicked: generatePopulation()
-    }
-
     Rectangle {
         id: mask
         width: 476
@@ -211,6 +318,13 @@ Rectangle {
                         listModel.setProperty(previousSelectionIndex, "selection", false)
                         listModel.setProperty(index, "selection", true)
 
+                        if (index === 5) {
+                            populationControl.state = 'gridSetter'
+                        }
+                        else {
+                            populationControl.state = ''
+                        }
+
                         previousSelectionIndex = index
                     }
                 }
@@ -229,6 +343,74 @@ Rectangle {
             }
         }
     }
+
+    Rectangle {
+        id: buttonMask
+        y: 378
+        width: 476
+        height: 70
+        opacity: 0
+        radius: 16
+    }
+
+    Item {
+        id: item1
+        y: 378
+        width: 476
+        height: 70
+        clip: true
+        layer.enabled: true
+        layer.effect: OpacityMask {
+            maskSource: buttonMask
+        }
+
+        CustomButton {
+            id: populateButton
+            width: 476
+            height: 70
+            cornerRadius: 0
+            text: "Populate"
+            onClicked: generatePopulation()
+        }
+
+        CustomButton {
+            id: setInGridButton
+            width: 234
+            height: 70
+            cornerRadius: 0
+            text: "Set in Grid"
+            anchors.left: populateButton.right
+            anchors.leftMargin: 8
+            onClicked: previewAction()
+        }
+    }
+
+    states: [
+        State {
+            name: "gridSetter"
+
+            PropertyChanges {
+                target: populateButton
+                width: 234
+                buttonFont: 35
+            }
+
+            PropertyChanges {
+                target: setInGridButton
+                buttonFont: 35
+            }
+        }
+    ]
+
+    transitions: [
+        Transition {
+            NumberAnimation {
+                properties: "width, buttonFont"
+                duration: 120
+                easing.type: Easing.OutQuad
+            }
+        }
+    ]
 
 //    CustomComboBox {
 //        id: customComboBox

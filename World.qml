@@ -9,14 +9,13 @@ Rectangle {
     height: 980
     color: "black"
 
-    onColumnsChanged: console.log("Columns changed to : " + columns)
-
     property bool debug: false
 
     property bool worldActive: false
     property bool playActive: false
     property bool menuActive: false
     property bool colorPaletteHovered: false
+    property bool previewMode: false
 
     property int rows // 54 Max
     property int columns // 105 Max
@@ -34,9 +33,16 @@ Rectangle {
     property var survivalRules: [2, 3]
     property var growthRules: [3]
 
+    property int currentHoveredIndex: 0
     property int generationProcessIndex: 0
     property int resetProcessIndex: 0
     property int colorGenerationIndex: 0
+
+    onCurrentHoveredIndexChanged: {
+        if (previewMode) {
+            controls.generatePreview()
+        }
+    }
 
     function generateWorld() {
         var index = 0
@@ -59,7 +65,7 @@ Rectangle {
                 }
 
                 grid.splice(index, 0, newCell)
-                population.splice(index, 0, false)
+                population.splice(index, 0, true)
 
                 index++
                 rowPosition += debug ? 32 + gridSpacing : 16 + gridSpacing
@@ -471,6 +477,12 @@ Rectangle {
         }
 
         return false
+    }
+
+    function clearPreviewGrid() {
+        for (var x = 0; x < grid.length; x++) {
+            selectorGrid[x].occupied = false
+        }
     }
 
     function dummyDirection() {
@@ -897,8 +909,10 @@ Rectangle {
         hoverEnabled: true
 
         onEntered: {
-            menuText.scale = 1.1
-            sidePanel.x = 1720
+            if (!previewMode) {
+                menuText.scale = 1.1
+                sidePanel.x = 1720
+            }
         }
 
         onExited: {
@@ -938,7 +952,7 @@ Rectangle {
         hoverEnabled: true
 
         onEntered: {
-            if (worldActive) {
+            if (worldActive && !previewMode) {
                 colorPaletteHovered = true
                 colorTextFrame.scale = 1.1
                 sidePanel.x = 1720
@@ -980,7 +994,7 @@ Rectangle {
         hoverEnabled: true
 
         onEntered: {
-            if (worldActive) {
+            if (worldActive && !previewMode) {
                 playText.scale = 1.1
                 sidePanel.x = 1720
             }
@@ -1038,6 +1052,36 @@ Rectangle {
         onColorsGenerated: {
             shades = colorArray
             colorGenerationProcess()
+        }
+    }
+
+    CustomButton {
+        id: donePreviewButton
+        x: 864
+        y: 944
+        width: 72
+        height: 28
+        cornerRadius: 8
+        buttonFont: 19
+        text: "Done"
+        anchors.horizontalCenter: parent.horizontalCenter
+        opacity: 0
+        scale: 0.8
+
+        onClicked: {
+            previewMode = false
+
+            opacity = 0
+            scale = 0.8
+            sidePanel.x = 1720
+        }
+
+        Behavior on opacity {
+            OpacityAnimator { duration: 120 }
+        }
+
+        Behavior on scale {
+            ScaleAnimator { duration: 120 }
         }
     }
 

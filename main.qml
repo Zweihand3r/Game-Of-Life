@@ -9,15 +9,14 @@ ApplicationWindow {
     title: qsTr("The Game Of Life")
 
     // Cyclic World
-    // Day n Night Rules
     // * Random gradient
     // Info
-    // Populate Pulsars
+    // Populate gliders, Pulsars
     // Colors based on age of cell. 1 cycle alive blue, 2 cycles alive green, 3 cycles alive red
     // Cycle counter and population counter below play. Maybe even graph between cycle and population
     //
-    // PUT MOAR SHAPES
-    //
+    // PUT MOAR SHAPES !!
+    // change orientation in like glider gun in preview
 
     property int initialRowCount: 32
     property int initialColumnCount: 64

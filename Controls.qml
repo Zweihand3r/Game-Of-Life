@@ -39,6 +39,14 @@ Rectangle {
         visibilityDisableTimer.start()
     }
 
+    function generatePreview() {
+        populationControl.generatePreview()
+    }
+
+    function setFromPreview() {
+        populationControl.setFromPreview()
+    }
+
     function resetCompletion() {
         loadingIndicator.hideLoading()
         blinkText.start()

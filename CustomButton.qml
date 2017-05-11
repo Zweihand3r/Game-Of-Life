@@ -6,11 +6,13 @@ Button {
     width: 200
     height: 70
     text: "button"
-    scale: control.pressed ? 0.95 : 1
+
+    property int buttonFont: 45
+    property int cornerRadius: 16
 
     background: Rectangle {
         color: control.pressed ? "black" : "white"
-        radius: 16
+        radius: cornerRadius
 
         Behavior on color {
             ColorAnimation { duration: 120 }
@@ -22,10 +24,11 @@ Button {
         text: control.text
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
-        font.pixelSize: 45
-    }
+        font.pixelSize: buttonFont
+        scale: control.pressed ? 0.95 : 1
 
-    Behavior on scale {
-        ScaleAnimator { duration: 120 }
+        Behavior on scale {
+            ScaleAnimator { duration: 120 }
+        }
     }
 }
