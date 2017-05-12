@@ -39,7 +39,7 @@ Rectangle {
     }
 
     function presentCompletion() {
-        if (paletteIndex > -1) {
+        if (paletteIndex == 2) {
             expandingOne.rotation = 0
             expandingOne.opacity = 1
             expandingOne.scale = 1
@@ -74,13 +74,14 @@ Rectangle {
 
     function radialSelection(index) {
         console.log("Called")
-        defaultRadial.selected = index === 0 // 0
-        randomRadial.selected = index === 3 // 3
+        defaultRadial.selected = index === -1 // 0
+        dynamicRadial.selected = index === 1
+        randomRadial.selected = index === 2 // 3
+
+        paletteIndex = index
 
         switch (index) {
         case -1:
-            paletteIndex = -1
-
             expandingOne.rotation = 60
             expandingOne.opacity = 0
             expandingOne.scale = 0.5
@@ -91,9 +92,15 @@ Rectangle {
 
         case 0:
         case 1:
-        case 2:
-            paletteIndex = index
+            expandingOne.rotation = 60
+            expandingOne.opacity = 0
+            expandingOne.scale = 0.5
+            expandingOneBackgroundCompanion.scale = 0.5
 
+            generateAgeShades()
+            break
+
+        case 2:
             expandingOne.rotation = 0
             expandingOne.opacity = 1
             expandingOne.scale = 1
@@ -183,6 +190,11 @@ Rectangle {
         colorsGenerated(colorArray)
     }
 
+    function generateAgeShades() {
+//        shades = ["white", "violet", "indigo", "blue", "green", "yellow", "orange", "red"]
+        shades = ["#111111", "#222222", "#333333", "#444444", "#555555", "#666666", "#777777", "#888888", "#999999", "#aaaaaa", "#bbbbbb", "#cccccc", "#dddddd", "#eeeeee", "#ffffff", "#face00"]
+    }
+
     function selectRandomColor(index) {
         redButton.switchState = index === 0
         greenButton.switchState = index === 1
@@ -210,121 +222,6 @@ Rectangle {
 
         Behavior on scale {
             ScaleAnimator { duration: 120 }
-        }
-    }
-
-    Rectangle { // Move below EO
-        id: innerWorld
-        width: 240
-        height: 240
-        radius: 120
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.verticalCenter: parent.verticalCenter
-        color: "transparent"
-        clip: true
-        border.color: "White"
-        border.width: 3
-
-        Behavior on border.color {
-            ColorAnimation { duration: 120 }
-        }
-
-        Rectangle {
-            id: innerCircle
-            width: 220
-            height: 220
-            radius: 110
-            color: "transparent"
-            rotation: 45
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.verticalCenter: parent.verticalCenter
-
-            Behavior on color {
-                ColorAnimation { duration: 120 }
-            }
-
-            MouseArea {
-                id: dismissMouse
-                width: 220
-                height: 220
-                hoverEnabled: true
-
-                onEntered: {
-                    innerWorld.border.color = Color.redTint
-                    innerCircle.color = Color.redTint
-
-                    defaultRadial.color = "black"
-                    randomRadial.color = "black"
-                }
-
-                onExited: {
-                    innerWorld.border.color = "white"
-                    innerCircle.color = "transparent"
-
-                    defaultRadial.color = "transparent"
-                    randomRadial.color = "transparent"
-                }
-
-                onClicked: dismissPalette()
-
-                Timer {
-                    id: transparetor
-                    running: false
-                    interval: 120
-                    onTriggered: {
-                        defaultRadial.color = "transparent"
-                        randomRadial.color = "transparent"
-                    }
-                }
-            }
-
-            Rectangle {
-                id: mask
-                width: 220
-                height: 220
-                radius: 110
-                color: "black"
-                opacity: 0
-            }
-
-            Item {
-                anchors.fill: mask
-                layer.enabled: true
-                layer.effect: OpacityMask {
-                    maskSource: mask
-                }
-
-                RadialButton {
-                    id: defaultRadial
-                    contentInsetX: 6
-                    contentInsetY: 6
-                    title: "Default"
-                    selected: true
-                    onPressed: radialSelection(-1)
-                }
-
-                RadialButton {
-                    y: 115
-                    title: "-"
-                    color: "black" // remove
-                }
-
-                RadialButton {
-                    x: 115
-                    y: 115
-                    title: "-"
-                    color: "black" // remove
-                }
-
-                RadialButton {
-                    id: randomRadial
-                    x: 115
-                    contentInsetX: -10
-                    contentInsetY: 10
-                    title: "Random"
-                    onPressed: radialSelection(2)
-                }
-            }
         }
     }
 
@@ -454,6 +351,125 @@ Rectangle {
                 dimension: 64
                 onSwitchedOn: selectRandomColor(5)
                 onSwitchedOff: resetRandomIndex()
+            }
+        }
+    }
+
+    Rectangle { // Move below EO
+        id: innerWorld
+        width: 240
+        height: 240
+        radius: 120
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
+        color: "transparent"
+        clip: true
+        border.color: "White"
+        border.width: 3
+
+        Behavior on border.color {
+            ColorAnimation { duration: 120 }
+        }
+
+        Rectangle {
+            id: innerCircle
+            width: 220
+            height: 220
+            radius: 110
+            color: "transparent"
+            rotation: 45
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
+
+            Behavior on color {
+                ColorAnimation { duration: 120 }
+            }
+
+            MouseArea {
+                id: dismissMouse
+                width: 220
+                height: 220
+                hoverEnabled: true
+
+                onEntered: {
+                    innerWorld.border.color = Color.redTint
+                    innerCircle.color = Color.redTint
+
+                    defaultRadial.color = Color.black
+                    randomRadial.color = Color.black
+                    dynamicRadial.color = Color.black
+                }
+
+                onExited: {
+                    innerWorld.border.color = Color.white
+                    innerCircle.color = Color.transparent
+
+                    defaultRadial.color = Color.transparent
+                    randomRadial.color = Color.transparent
+                    dynamicRadial.color = Color.transparent
+                }
+
+                onClicked: dismissPalette()
+
+                Timer {
+                    id: transparetor
+                    running: false
+                    interval: 120
+                    onTriggered: {
+                        defaultRadial.color = Color.transparent
+                        randomRadial.color = Color.transparent
+                    }
+                }
+            }
+
+            Rectangle {
+                id: mask
+                width: 220
+                height: 220
+                radius: 110
+                opacity: 0
+            }
+
+            Item {
+                anchors.fill: mask
+                layer.enabled: true
+                layer.effect: OpacityMask {
+                    maskSource: mask
+                }
+
+                RadialButton {
+                    id: defaultRadial
+                    contentInsetX: 6
+                    contentInsetY: 6
+                    title: "Default"
+                    selected: true
+                    onPressed: radialSelection(-1)
+                }
+
+                RadialButton {
+                    y: 115
+                    title: "-"
+                    color: "black" // remove
+                }
+
+                RadialButton {
+                    id: dynamicRadial
+                    x: 115
+                    y: 115
+                    contentInsetX: -8
+                    contentInsetY: -8
+                    title: "Dynamic"
+                    onPressed: radialSelection(1)
+                }
+
+                RadialButton {
+                    id: randomRadial
+                    x: 115
+                    contentInsetX: -10
+                    contentInsetY: 10
+                    title: "Random"
+                    onPressed: radialSelection(2)
+                }
             }
         }
     }

@@ -29,6 +29,7 @@ Rectangle {
     property var selectorGrid: []
     property var population: []
     property var shades: []
+    property var ages: []
 
     property var survivalRules: [2, 3]
     property var growthRules: [3]
@@ -66,6 +67,7 @@ Rectangle {
 
                 grid.splice(index, 0, newCell)
                 population.splice(index, 0, true)
+                ages.splice(index, 0, 0)
 
                 index++
                 rowPosition += debug ? 32 + gridSpacing : 16 + gridSpacing
@@ -249,6 +251,19 @@ Rectangle {
                     if (growthIndex === growthRules[index2]) {
                         counter = true
                         break
+                    }
+                }
+            }
+
+            if (colorPalette.paletteIndex === 1) {
+                if (!counter) {
+                    ages[index] = 0
+                    grid[index].color = shades[ages[index]]
+                }
+                else {
+                    if (ages[index] < shades.length - 1) {
+                        ages[index]++
+                        grid[index].color = shades[ages[index]]
                     }
                 }
             }
