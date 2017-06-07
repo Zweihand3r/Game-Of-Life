@@ -93,13 +93,15 @@ Rectangle {
             var index = 0
             var rowPosition = 0
             var colPosition = 0
+            var radius = controls.selectedShape === "cir"
+            var rotation = controls.selectedShape === "dia"
 
             var componentId = "SelectorCell.qml"
 
             for (var row = 0; row < rows; row++) {
                 for (var col = 0; col < columns; col++) {
                     var component = Qt.createComponent(componentId)
-                    var selectorCell = component.createObject(worldGrid, { "x":rowPosition, "y":colPosition, "gridIndex": index })
+                    var selectorCell = component.createObject(worldGrid, { "x":rowPosition, "y":colPosition, "isCircle":radius, "isDiamond":rotation, "gridIndex": index })
 
                     selectorGrid.splice(index, 0, selectorCell)
 
@@ -384,8 +386,26 @@ Rectangle {
     }
 
     function colorGenerationProcess() {
-        for (var index = colorGenerationIndex; index < grid.length; index += columns) {
-            grid[index].color = shades[index]
+        if (shades.length === rows * columns) {
+            for (var index = colorGenerationIndex; index < grid.length; index += columns) {
+                grid[index].color = shades[index]
+            }
+        }
+        else {
+            switch (colorPalette.paletteIndex) {
+            case 1:
+                for (index = colorGenerationIndex; index < grid.length; index += columns) {
+                    grid[index].color = shades[0]
+                }
+                break
+
+            case -1:
+            case 2:
+                for (index = colorGenerationIndex; index < grid.length; index += columns) {
+                    grid[index].color = shades[index % columns]
+                }
+                break
+            }
         }
 
         colorGenerationIndex++
@@ -1061,8 +1081,6 @@ Rectangle {
 
     ColorPalette {
         id: colorPalette
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.verticalCenter: parent.verticalCenter
 
         onColorsGenerated: {
             shades = colorArray

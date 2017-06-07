@@ -20,6 +20,8 @@ Rectangle {
         case 3: checkeredGeneration(); break
         case 4: stripeGeneration(); break
         case 5: gliderGunGeneration(24); break
+        case 6: period3PulsarGeneration(4 + columns * 4); break
+        case 7: period15PentadecathlonGeneration(4 + columns * 4); break
         }
     }
 
@@ -42,12 +44,16 @@ Rectangle {
     function generatePreview() {
         switch (previousSelectionIndex) {
         case 5: gliderGunPreview(currentHoveredIndex); break
+        case 6: period3PulsarPreview(currentHoveredIndex); break
+        case 7: period15PentadecathlonPreview(currentHoveredIndex); break
         }
     }
 
     function setFromPreview() {
         switch (previousSelectionIndex) {
         case 5: gliderGunGeneration(currentHoveredIndex); break
+        case 6: period3PulsarGeneration(currentHoveredIndex); break
+        case 7: period15PentadecathlonGeneration(currentHoveredIndex); break
         }
     }
 
@@ -279,6 +285,242 @@ Rectangle {
         grid[index + 13].occupied = true
     }
 
+    function period3PulsarPreview(index) {
+        // First Line
+        selectorGrid[index + 2].occupied = true
+        selectorGrid[index + 3].occupied = true
+        selectorGrid[index + 4].occupied = true
+        selectorGrid[index + 8].occupied = true
+        selectorGrid[index + 9].occupied = true
+        selectorGrid[index + 10].occupied = true
+
+        // Second line
+        index += columns * 2
+        selectorGrid[index].occupied = true
+        selectorGrid[index + 5].occupied = true
+        selectorGrid[index + 7].occupied = true
+        selectorGrid[index + 12].occupied = true
+
+        // Third line
+        index += columns
+        selectorGrid[index].occupied = true
+        selectorGrid[index + 5].occupied = true
+        selectorGrid[index + 7].occupied = true
+        selectorGrid[index + 12].occupied = true
+
+        // Next line
+        index += columns
+        selectorGrid[index].occupied = true
+        selectorGrid[index + 5].occupied = true
+        selectorGrid[index + 7].occupied = true
+        selectorGrid[index + 12].occupied = true
+
+        // Next Line
+        index += columns
+        selectorGrid[index + 2].occupied = true
+        selectorGrid[index + 3].occupied = true
+        selectorGrid[index + 4].occupied = true
+        selectorGrid[index + 8].occupied = true
+        selectorGrid[index + 9].occupied = true
+        selectorGrid[index + 10].occupied = true
+
+        // Next Line
+        index += columns * 2
+        selectorGrid[index + 2].occupied = true
+        selectorGrid[index + 3].occupied = true
+        selectorGrid[index + 4].occupied = true
+        selectorGrid[index + 8].occupied = true
+        selectorGrid[index + 9].occupied = true
+        selectorGrid[index + 10].occupied = true
+
+        // Next line
+        index += columns
+        selectorGrid[index].occupied = true
+        selectorGrid[index + 5].occupied = true
+        selectorGrid[index + 7].occupied = true
+        selectorGrid[index + 12].occupied = true
+
+        // Next line
+        index += columns
+        selectorGrid[index].occupied = true
+        selectorGrid[index + 5].occupied = true
+        selectorGrid[index + 7].occupied = true
+        selectorGrid[index + 12].occupied = true
+
+        // Next line
+        index += columns
+        selectorGrid[index].occupied = true
+        selectorGrid[index + 5].occupied = true
+        selectorGrid[index + 7].occupied = true
+        selectorGrid[index + 12].occupied = true
+
+        // Next Line
+        index += columns * 2
+        selectorGrid[index + 2].occupied = true
+        selectorGrid[index + 3].occupied = true
+        selectorGrid[index + 4].occupied = true
+        selectorGrid[index + 8].occupied = true
+        selectorGrid[index + 9].occupied = true
+        selectorGrid[index + 10].occupied = true
+    }
+
+    function period3PulsarGeneration(index) {
+        if (!previewMode) {
+            for (var x = 0; x < grid.length; x++) {
+                grid[x].occupied = false
+            }
+        }
+
+        // First Line
+        grid[index + 2].occupied = true
+        grid[index + 3].occupied = true
+        grid[index + 4].occupied = true
+        grid[index + 8].occupied = true
+        grid[index + 9].occupied = true
+        grid[index + 10].occupied = true
+
+        // Second line
+        index += columns * 2
+        grid[index].occupied = true
+        grid[index + 5].occupied = true
+        grid[index + 7].occupied = true
+        grid[index + 12].occupied = true
+
+        // Third line
+        index += columns
+        grid[index].occupied = true
+        grid[index + 5].occupied = true
+        grid[index + 7].occupied = true
+        grid[index + 12].occupied = true
+
+        // Next line
+        index += columns
+        grid[index].occupied = true
+        grid[index + 5].occupied = true
+        grid[index + 7].occupied = true
+        grid[index + 12].occupied = true
+
+        // Next Line
+        index += columns
+        grid[index + 2].occupied = true
+        grid[index + 3].occupied = true
+        grid[index + 4].occupied = true
+        grid[index + 8].occupied = true
+        grid[index + 9].occupied = true
+        grid[index + 10].occupied = true
+
+        // Next Line
+        index += columns * 2
+        grid[index + 2].occupied = true
+        grid[index + 3].occupied = true
+        grid[index + 4].occupied = true
+        grid[index + 8].occupied = true
+        grid[index + 9].occupied = true
+        grid[index + 10].occupied = true
+
+        // Next line
+        index += columns
+        grid[index].occupied = true
+        grid[index + 5].occupied = true
+        grid[index + 7].occupied = true
+        grid[index + 12].occupied = true
+
+        // Next line
+        index += columns
+        grid[index].occupied = true
+        grid[index + 5].occupied = true
+        grid[index + 7].occupied = true
+        grid[index + 12].occupied = true
+
+        // Next line
+        index += columns
+        grid[index].occupied = true
+        grid[index + 5].occupied = true
+        grid[index + 7].occupied = true
+        grid[index + 12].occupied = true
+
+        // Next Line
+        index += columns * 2
+        grid[index + 2].occupied = true
+        grid[index + 3].occupied = true
+        grid[index + 4].occupied = true
+        grid[index + 8].occupied = true
+        grid[index + 9].occupied = true
+        grid[index + 10].occupied = true
+    }
+
+    function period15PentadecathlonPreview(index) {
+        selectorGrid[index].occupied = true
+
+        index += columns
+        selectorGrid[index].occupied = true
+
+        index += columns
+        selectorGrid[index - 1].occupied = true
+        selectorGrid[index + 1].occupied = true
+
+        index += columns
+        selectorGrid[index].occupied = true
+
+        index += columns
+        selectorGrid[index].occupied = true
+
+        index += columns
+        selectorGrid[index].occupied = true
+
+        index += columns
+        selectorGrid[index].occupied = true
+
+        index += columns
+        selectorGrid[index - 1].occupied = true
+        selectorGrid[index + 1].occupied = true
+
+        index += columns
+        selectorGrid[index].occupied = true
+
+        index += columns
+        selectorGrid[index].occupied = true
+    }
+
+    function period15PentadecathlonGeneration(index) {
+        if (!previewMode) {
+            for (var x = 0; x < grid.length; x++) {
+                grid[x].occupied = false
+            }
+        }
+
+        grid[index].occupied = true
+
+        index += columns
+        grid[index].occupied = true
+
+        index += columns
+        grid[index - 1].occupied = true
+        grid[index + 1].occupied = true
+
+        index += columns
+        grid[index].occupied = true
+
+        index += columns
+        grid[index].occupied = true
+
+        index += columns
+        grid[index].occupied = true
+
+        index += columns
+        grid[index].occupied = true
+
+        index += columns
+        grid[index - 1].occupied = true
+        grid[index + 1].occupied = true
+
+        index += columns
+        grid[index].occupied = true
+
+        index += columns
+        grid[index].occupied = true
+    }
+
     Rectangle {
         id: mask
         width: 476
@@ -318,7 +560,7 @@ Rectangle {
                         listModel.setProperty(previousSelectionIndex, "selection", false)
                         listModel.setProperty(index, "selection", true)
 
-                        if (index === 5) {
+                        if (index >= 5) {
                             populationControl.state = 'gridSetter'
                         }
                         else {
@@ -333,12 +575,14 @@ Rectangle {
 
                 model: ListModel {
                     id: listModel
-                    ListElement { name: "Fill || Clear"; selection: true }
+                    ListElement { name: "Fill/Clear"; selection: true }
                     ListElement { name: "Reverse"; selection: false }
                     ListElement { name: "Random"; selection: false }
                     ListElement { name: "Checkered"; selection: false }
                     ListElement { name: "Striped"; selection: false }
                     ListElement { name: "Glider Gun"; selection: false }
+                    ListElement { name: "Period 3 Pulsar"; selection: false }
+                    ListElement { name: "Period 15 Pentadecathlon"; selection: false }
                 }
             }
         }

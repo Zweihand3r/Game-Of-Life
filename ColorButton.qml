@@ -1,5 +1,6 @@
 import QtQuick 2.6
 import QtQuick.Controls 2.0
+import QtGraphicalEffects 1.0
 
 Button {
     id: control
@@ -12,9 +13,30 @@ Button {
     signal switchedOff()
 
     property string tint: "black"
+    property string gradient0: "#114357"
+    property string gradient1: "#F29492"
+
     property int dimension: 64
     property bool switchState: false
     property bool connected: false
+    property bool enableGradient: false
+
+    function switchMode() {
+        scale = 0
+        switchTimer.start()
+    }
+
+    function switchEnding() {
+        gradient.visible = enableGradient
+        scale = 1
+    }
+
+    Timer {
+        id: switchTimer
+        running: false
+        interval: 120
+        onTriggered: switchEnding()
+    }
 
     background: Rectangle {
         color: "transparent"
@@ -34,6 +56,24 @@ Button {
             Behavior on scale {
                 ScaleAnimator { duration: 120 }
             }
+        }
+    }
+
+    LinearGradient {
+        id: gradient
+        width: dimension
+        height: dimension
+        start: Qt.point(0, 0)
+        end: Qt.point(dimension, 0)
+        source: control
+
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: gradient0 }
+            GradientStop { position: 1.0; color: gradient1 }
+        }
+
+        Behavior on opacity {
+            OpacityAnimator { duration: 120 }
         }
     }
 

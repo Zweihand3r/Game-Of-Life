@@ -40,7 +40,7 @@ Rectangle {
         anchors.fill: parent
         hoverEnabled: true
 
-        onEntered: !selected ? titleText.scale = 1.15 : null
+        onEntered: !selected ? titleText.scale = 1.05 : null
         onExited: titleText.scale = 1
         onClicked: cellSelected()
     }

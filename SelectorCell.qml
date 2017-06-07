@@ -8,6 +8,8 @@ MouseArea {
 
     property int gridIndex: 0
     property bool occupied: false
+    property bool isCircle: false
+    property bool isDiamond: false
 
     onEntered: if (previewMode) currentHoveredIndex = gridIndex
     onExited: if (previewMode) clearPreviewGrid()
@@ -25,5 +27,7 @@ MouseArea {
         color: "transparent"
         border.width: occupied ? 1 : 0
         border.color: "white"
+        rotation: isDiamond ? 45 : 0
+        radius: isCircle ? 8 : 0
     }
 }

@@ -163,8 +163,6 @@ Rectangle {
         root.spacingSelected(spacing)
         currentSpacing = spacing
 
-        console.log(rowTumbler.count - 1, columnTumbler.count - 1)
-
         if (rowPreviousIndex > rowTumbler.count) {
             rowTumbler.currentIndex = rowTumbler.count - 1
         }
