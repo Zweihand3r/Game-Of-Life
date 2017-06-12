@@ -1,4 +1,4 @@
-import QtQuick 2.6
+import QtQuick 2.7
 import QtQuick.Controls 2.0
 import QtGraphicalEffects 1.0
 
@@ -9,9 +9,9 @@ Rectangle {
     width: 480
     height: 480
     color: "transparent"
-//    anchors.horizontalCenter: parent.horizontalCenter
-//    anchors.verticalCenter: parent.verticalCenter
-    scale: 1
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.verticalCenter: parent.verticalCenter
+    scale: 0
 
     signal colorsGenerated(var colorArray)
 
@@ -46,7 +46,7 @@ Rectangle {
     }
 
     function presentCompletion() {
-        if (paletteIndex == -1) {
+        if (paletteIndex == -1 || paletteIndex == 1) {
             expandingOne.rotation = 0
             expandingOne.opacity = 1
             expandingOne.scale = 1
@@ -66,7 +66,7 @@ Rectangle {
             return
         }
 
-        if (paletteIndex == -1) {
+        if (paletteIndex == -1 || paletteIndex == 1) {
             expandingOne.rotation = 60
             expandingOne.opacity = 0
             expandingOne.scale = 0.5
@@ -79,6 +79,13 @@ Rectangle {
         }
     }
 
+    Timer {
+        id: switchOuterPaletteTimer
+        interval: 120
+        running: false
+        onTriggered: switchOuterPalette()
+    }
+
     function radialSelection(index) {
         presetRadial.selected = index === -1 // 0
         defaultRadial.selected = index === 0
@@ -89,30 +96,36 @@ Rectangle {
 
         switch (index) {
         case -1:
-            expandingOne.rotation = 0
-            expandingOne.opacity = 1
-            expandingOne.scale = 1
-            expandingOneBackgroundCompanion.scale = 1
+            if (expandingOne.scale != 1) {
+                switchOuterPalette()
+            }
+            else {
+                collapseExpadingOne()
+                switchOuterPaletteTimer.start()
+            }
 
-            selectPresetSets()
+            for (var x in buttons) {
+                buttons[x].switchState = false
+                presetCombos[x] = false
+            }
+            resetRandomIndex()
             break
 
         case 0:
-            expandingOne.rotation = 60
-            expandingOne.opacity = 0
-            expandingOne.scale = 0.5
-            expandingOneBackgroundCompanion.scale = 0.5
-
+            collapseExpadingOne()
             generateDefaultColors()
             break
 
         case 1:
-            expandingOne.rotation = 60
-            expandingOne.opacity = 0
-            expandingOne.scale = 0.5
-            expandingOneBackgroundCompanion.scale = 0.5
+            if (expandingOne.scale != 1) {
+                switchOuterPalette()
+            }
+            else {
+                collapseExpadingOne()
+                switchOuterPaletteTimer.start()
+            }
 
-            for (var x = 0; x < ages.length; x++) {
+            for (x = 0; x < ages.length; x++) {
                 ages[x] = 0
             }
 
@@ -120,14 +133,30 @@ Rectangle {
             break
 
         case 2:
-            expandingOne.rotation = 60
-            expandingOne.opacity = 0
-            expandingOne.scale = 0.5
-            expandingOneBackgroundCompanion.scale = 0.5
-
+            collapseExpadingOne()
             generateSequentialGradient()
             break
         }
+    }
+
+    function expandExpandingOne() {
+        expandingOne.rotation = 0
+        expandingOne.opacity = 1
+        expandingOne.scale = 1
+        expandingOneBackgroundCompanion.scale = 1
+    }
+
+    function collapseExpadingOne() {
+        expandingOne.rotation = 60
+        expandingOne.opacity = 0
+        expandingOne.scale = 0.5
+        expandingOneBackgroundCompanion.scale = 0.5
+    }
+
+    function switchOuterPalette() {
+        randomExpander.visible = paletteIndex == -1
+        dynamicExpander.visible = paletteIndex == 1
+        expandExpandingOne()
     }
 
     function generateDefaultColors() {
@@ -251,159 +280,86 @@ Rectangle {
 
         var colorArray = []
 
-        var comboIndex = 0
-        var stepIndex = 0
+        var totalSteps = columns * rows - 1
 
-        var steps = columns * rows - 1
+        for (var index = 0; index < combos.length - 1; index++) {
+            var gradient0 = getColorButton(combos[index]).tint
+            var gradient1 = getColorButton(combos[index + 1]).tint
+            var steps = parseInt(totalSteps / parseInt(combos.length - 1))
 
-        for (var index = 0; index <= steps; index++) {
-            if (parseInt(index % (steps / combos.length)) === 0) {
-//                console.log(index, parseInt(index % (steps / combos.length)))
-//                console.log(getColorButton(comboIndex).tint, getColorButton(comboIndex + 1).tint)
+            var transitoryArray = generateGradient(gradient0, gradient1, steps)
 
-                if (comboIndex < combos.length - 2) {
-                    var red1 = getRed(getColorButton(combos[comboIndex]).tint)
-                    var red2 = getRed(getColorButton(combos[comboIndex + 1]).tint)
-                    var green1 = getGreen(getColorButton(combos[comboIndex]).tint)
-                    var green2 = getGreen(getColorButton(combos[comboIndex + 1]).tint)
-                    var blue1 = getBlue(getColorButton(combos[comboIndex]).tint)
-                    var blue2 = getBlue(getColorButton(combos[comboIndex + 1]).tint)
-
-                    var redStep = ((red2 - red1) / steps / (combos.length - 2))
-                    var greenStep = ((green2 - green1) / steps / (combos.length - 2))
-                    var blueStep = ((blue2 - blue1) / steps / (combos.length - 2))
-
-                    comboIndex++
-                    stepIndex = 0
-                }
-
-//                console.log(redStep, greenStep, blueStep)
-
-            }
-
-            var red = parseInt(red1 + redStep * stepIndex).toString(16)
-            var green = parseInt(green1 + greenStep * stepIndex).toString(16)
-            var blue = parseInt(blue1 + blueStep * stepIndex).toString(16)
-
-            console.log(steps / (combos.length - 1), stepIndex)
-
-            red = red.length < 2 ? "0" + red : red
-            green = green.length < 2 ? "0" + green : green
-            blue = blue.length < 2 ? "0" + blue : blue
-
-            var color = "#" + red + green + blue
-
-            stepIndex++
-
-            colorArray.push(color)
+            transitoryArray.forEach(function(color) {
+                colorArray.push(color)
+            })
         }
 
-//        var shuffledArray = shuffle(colorArray)
+        // Need to come up with better logic. This is barely working as intended
+
+        console.log(colorArray.length, totalSteps)
+
+        var shuffledArray = shuffle(colorArray)
         colorsGenerated(colorArray)
     }
 
     function generateAgeShades() {
         var colorArray = []
-        // FACE colors look pleasant
 
-        var red1 = 0x11
-        var red2 = 0xF2
-        var green1 = 0x43
-        var green2 = 0x94
-        var blue1 = 0x57
-        var blue2 = 0x92
+        var colors = [dynamicButton1.tint, dynamicButton2.tint]
+        var steps = [parseInt(dynamicSetButton1.onText)]
 
-        var steps = 100
+        if (!dynamicButton3.addMode) {
+            colors.push(dynamicButton3.tint)
+            steps.push(parseInt(dynamicSetButton2.onText))
+        }
 
-        var redStep = ((red2 - red1) / steps)
-        var greenStep = ((green2 - green1) / steps)
-        var blueStep = ((blue2 - blue1) / steps)
+        if (!dynamicButton4.addMode) {
+            colors.push(dynamicButton4.tint)
+            steps.push(parseInt(dynamicSetButton3.onText))
+        }
 
-        for (var index = 0; index <= steps; index++) {
-            var red = parseInt(red1 + redStep * index)
-            var green = parseInt(green1 + greenStep * index)
-            var blue = parseInt(blue1 + blueStep * index)
-            var color = "#" + red.toString(16) + green.toString(16) + blue.toString(16)
+        for (var index = 0; index < colors.length - 1; index++) {
+            var gradient0 = colors[index]
+            var gradient1 = colors[index + 1]
+            var stepCount = steps[index]
 
-            colorArray.push(color)
+            var transitoryArray = generateGradient(gradient0, gradient1, stepCount)
+
+            transitoryArray.forEach(function(color) {
+                colorArray.push(color)
+            })
         }
 
         colorsGenerated(colorArray)
     }
 
     function generateAltGradient() {
+        var colorArray = generateGradient("#114357", "#F29492", rows * columns - 1)
+        colorsGenerated(colorArray)
+    }
+
+    function generateGradientColors(gradient0, gradient1) {
+        var colorArray = generateGradient(gradient0, gradient1, columns - 1)
+        colorsGenerated(colorArray)
+    }
+
+    function generateGradient(gradient0, gradient1, steps) {
         var colorArray = []
 
-        var red1 = 0x11
-        var red2 = 0xF2
-        var green1 = 0x43
-        var green2 = 0x94
-        var blue1 = 0x57
-        var blue2 = 0x92
+        console.log(gradient0, gradient1, steps)
 
-        var steps = rows * columns - 1
+        var red1 = getRed(gradient0)
+        var red2 = getRed(gradient1)
+        var green1 = getGreen(gradient0)
+        var green2 = getGreen(gradient1)
+        var blue1 = getBlue(gradient0)
+        var blue2 = getBlue(gradient1)
 
         var redStep = ((red2 - red1) / steps)
         var greenStep = ((green2 - green1) / steps)
         var blueStep = ((blue2 - blue1) / steps)
 
         for (var index = 0; index <= steps; index++) {
-            var red = parseInt(red1 + redStep * index)
-            var green = parseInt(green1 + greenStep * index)
-            var blue = parseInt(blue1 + blueStep * index)
-            var color = "#" + red.toString(16) + green.toString(16) + blue.toString(16)
-
-            colorArray.push(color)
-        }
-
-        colorsGenerated(colorArray)
-    }
-
-    function generateGradientColors(gradient0, gradient1) {
-        var colorArray = []
-
-        var red1Str = ""
-        var red2Str = ""
-        var green1Str = ""
-        var green2Str = ""
-        var blue1Str = ""
-        var blue2Str = ""
-
-        for (var index = 0; index < gradient0.length; index++) {
-            switch (index) {
-            case 1:
-            case 2:
-                red1Str += gradient0.charAt(index)
-                red2Str += gradient1.charAt(index)
-                break
-
-            case 3:
-            case 4:
-                green1Str += gradient0.charAt(index)
-                green2Str += gradient1.charAt(index)
-                break
-
-            case 5:
-            case 6:
-                blue1Str += gradient0.charAt(index)
-                blue2Str += gradient1.charAt(index)
-            }
-        }
-
-        var red1 = parseInt(red1Str, 16)
-        var red2 = parseInt(red2Str, 16)
-        var green1 = parseInt(green1Str, 16)
-        var green2 = parseInt(green2Str, 16)
-        var blue1 = parseInt(blue1Str, 16)
-        var blue2 = parseInt(blue2Str, 16)
-
-        var steps = columns - 1
-
-        var redStep = ((red2 - red1) / steps)
-        var greenStep = ((green2 - green1) / steps)
-        var blueStep = ((blue2 - blue1) / steps)
-
-        for (index = 0; index <= steps; index++) {
             var red = parseInt(red1 + redStep * index).toString(16)
             var green = parseInt(green1 + greenStep * index).toString(16)
             var blue = parseInt(blue1 + blueStep * index).toString(16)
@@ -417,7 +373,7 @@ Rectangle {
             colorArray.push(color)
         }
 
-        colorsGenerated(colorArray)
+        return colorArray
     }
 
     function generateSequentialGradient() {
@@ -459,13 +415,12 @@ Rectangle {
     }
 
     function selectPresetSets() {
-        if (presetSelectionIndex < 0) {
-            resetRandomIndex()
-        }
-        else {
-            selectPreset(presetSelectionIndex, getColorButton(presetSelectionIndex))
+        for (var index in buttons) {
+            buttons[index].switchState = false
+            presetCombos[index] = false
         }
 
+        resetRandomIndex()
         switchPresets(tumbler.currentIndex)
     }
 
@@ -506,26 +461,43 @@ Rectangle {
     }
 
     function resetRandomIndex() {
+        if (paletteIndex != -1) {
+            return
+        }
+
         presetSelectionIndex = -1
 
         switch (tumbler.currentIndex) {
-        case 0: generateRandom([]); break
-        case 1: generateGradientColors("#000000", "#FFFFFF"); break
+        case 0:
+            generateRandom([])
+            break
+
+        case 1:
+            redButton.switchState = false
+            greenButton.switchState = false
+            blueButton.switchState = false
+            purpleButton.switchState = false
+            yellowButton.switchState = false
+            cyanButton.switchState = false
+            redButton1.switchState = false
+            cyanButton1.switchState = false
+            generateGradientColors("#000000", "#FFFFFF")
+            break
         }
     }
 
     function shuffle(array) {
-      var m = array.length, t, i;
+        var m = array.length, t, i;
 
-      while (m) {
-        i = Math.floor(Math.random() * m--);
+        while (m) {
+            i = Math.floor(Math.random() * m--);
 
-        t = array[m];
-        array[m] = array[i];
-        array[i] = t;
-      }
+            t = array[m];
+            array[m] = array[i];
+            array[i] = t;
+        }
 
-      return array;
+        return array;
     }
 
     function checkComboCondition() {
@@ -556,9 +528,9 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
         color: "transparent"
-        opacity: 1//0
-        scale: 1//0.5
-//        rotation: 60
+        opacity: 0
+        scale: 0.5
+        rotation: 60
 
         Behavior on rotation {
             RotationAnimation { duration: 120 }
@@ -581,6 +553,7 @@ Rectangle {
             anchors.leftMargin: 0
             anchors.topMargin: 0
             color: "black"//"transparent"
+            visible: false
 
             ColorButton {
                 id: redButton
@@ -704,47 +677,110 @@ Rectangle {
                     font.pixelSize: 35
                     scale: 1.0 - Math.abs(Tumbler.displacement) / 5.2
                     opacity: 1.0 - Math.abs(Tumbler.displacement) / 1.45
-
-                    //                    Behavior on scale {
-                    //                        ScaleAnimator { duration: 120 }
-                    //                    }
                 }
 
                 onCurrentIndexChanged: switchPresets(currentIndex)
             }
         }
-    }
 
-    function switchPresets(index) {
-        switch (index) {
-        case 0:
-            buttons[presetSwitchIterator].enableGradient = false
-            buttons[presetSwitchIterator].switchMode()
-            break
+        Rectangle {
+            id: dynamicExpander
+            anchors.fill: parent // 480x480
+            color: "transparent"
 
-        case 1:
-            buttons[presetSwitchIterator].enableGradient = true
-            buttons[presetSwitchIterator].switchMode()
-            break
+            ColorButton {
+                id: dynamicButton1
+                x: 208
+                y: 30
+                tint: "#114357"
+                enableGradient: false
+                addMode: false
+                connected: true
+                switchState: true
+            }
+
+            ToggleButton {
+                id: dynamicSetButton1
+                x: 345
+                y: 97
+                dimension: 56
+                square: true
+                diamond: true
+                onText: "32"
+                offText: "32"
+                connected: true
+                switchState: true
+            }
+
+            ColorButton {
+                id: dynamicButton2
+                x: 390
+                y: 208
+                tint: "#f29492"
+                enableGradient: false
+                addMode: false
+                connected: true
+                switchState: true
+            }
+
+            ToggleButton {
+                id: dynamicSetButton2
+                x: 345
+                y: 326
+                dimension: 56
+                square: true
+                diamond: true
+                onText: "Set"
+                offText: "Set"
+                connected: true
+                switchState: true
+            }
+
+            ColorButton {
+                id: dynamicButton3
+                x: 208
+                y: 383
+                tint: "white"
+                enableGradient: false
+                addMode: true
+            }
+
+            ToggleButton {
+                id: dynamicSetButton3
+                x: 75
+                y: 326
+                dimension: 56
+                square: true
+                diamond: true
+                onText: "Set"
+                offText: "Set"
+                connected: true
+                scale: 0
+            }
+
+            ColorButton {
+                id: dynamicButton4
+                x: 27
+                y: 208
+                tint: "white"
+                enableGradient: false
+                addMode: true
+                scale: 0
+            }
+
+            ToggleButton {
+                id: dynamicSetButton4
+                x: 75
+                y: 97
+                dimension: 56
+                square: true
+                diamond: true
+                onText: "Set"
+                offText: "Set"
+                connected: true
+                scale: 0
+            }
         }
-
-        if (presetSwitchIterator < buttons.length - 1) {
-            presetSwitchIterator++
-            switchPresetTimer.start()
-        }
-        else {
-            presetSwitchIterator = 0
-
-            // Finish Anim
-
-        }
-    }
-
-    Timer {
-        id: switchPresetTimer
-        running: false
-        interval: 64
-        onTriggered: selectPresetSets()
     }
 
     Rectangle { // Move below EO
@@ -860,4 +896,38 @@ Rectangle {
             }
         }
     }
+
+    function switchPresets(index) {
+        switch (index) {
+        case 0:
+            buttons[presetSwitchIterator].enableGradient = false
+            buttons[presetSwitchIterator].switchMode()
+            break
+
+        case 1:
+            buttons[presetSwitchIterator].enableGradient = true
+            buttons[presetSwitchIterator].switchMode()
+            break
+        }
+
+        if (presetSwitchIterator < buttons.length - 1) {
+            presetSwitchIterator++
+            switchPresetTimer.start()
+        }
+        else {
+            presetSwitchIterator = 0
+
+            // Finish Anim
+
+        }
+    }
+
+    Timer {
+        id: switchPresetTimer
+        running: false
+        interval: 64
+        onTriggered: selectPresetSets()
+    }
+
+
 }

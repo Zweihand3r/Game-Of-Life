@@ -19,6 +19,7 @@ Button {
     property int fontSize: 19
     property bool switchState: false
     property bool square: false
+    property bool diamond: false
     property bool connected: false
 
     property bool round: width === height && !square
@@ -28,6 +29,7 @@ Button {
         radius: square ? 0 : (round ? dimension / 2 : 8)
         border.width: 2
         border.color: tint
+        rotation: diamond ? 45 : 0
 
         Rectangle {
             x: 4
@@ -44,7 +46,7 @@ Button {
         }
     }
 
-    contentItem: Label {
+    contentItem: Text {
         color: switchState ? "black" : tint
         text: switchState ? onText : offText
         horizontalAlignment: Text.AlignHCenter

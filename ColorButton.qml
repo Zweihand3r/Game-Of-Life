@@ -13,13 +13,14 @@ Button {
     signal switchedOff()
 
     property string tint: "black"
-    property string gradient0: "#114357"
-    property string gradient1: "#F29492"
+    property string gradient0: ""
+    property string gradient1: ""
 
     property int dimension: 64
     property bool switchState: false
     property bool connected: false
     property bool enableGradient: false
+    property bool addMode: false
 
     function switchMode() {
         scale = 0
@@ -38,6 +39,20 @@ Button {
         onTriggered: switchEnding()
     }
 
+    contentItem: Text {
+        text: "+"
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
+        color: "#ffffff"
+        font.pixelSize: 45
+        bottomPadding: 6
+        scale: addMode ? 1 : 0
+
+        Behavior on scale {
+            ScaleAnimator { duration: 80 }
+        }
+    }
+
     background: Rectangle {
         color: "transparent"
         radius: dimension / 2
@@ -51,7 +66,7 @@ Button {
             height: control.height - 20
             radius: dimension / 2
             color: tint
-            scale: switchState ? 1 : 0
+            scale: switchState && !addMode ? 1 : 0
 
             Behavior on scale {
                 ScaleAnimator { duration: 120 }
@@ -66,6 +81,7 @@ Button {
         start: Qt.point(0, 0)
         end: Qt.point(dimension, 0)
         source: control
+        visible: enableGradient
 
         gradient: Gradient {
             GradientStop { position: 0.0; color: gradient0 }

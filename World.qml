@@ -386,7 +386,7 @@ Rectangle {
     }
 
     function colorGenerationProcess() {
-        if (shades.length === rows * columns) {
+        if (shades.length >= rows * columns) {
             for (var index = colorGenerationIndex; index < grid.length; index += columns) {
                 grid[index].color = shades[index]
             }
