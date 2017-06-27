@@ -16,11 +16,14 @@ Rectangle {
     property bool menuActive: false
     property bool colorPaletteHovered: false
     property bool previewMode: false
+    property bool gridHighlight: false
 
     property int rows // 54 Max
     property int columns // 105 Max
     property int gridSpacing: 2
     property int cycleInterval: 160
+    property int generations: 0
+    property int populationCount: 0
     property bool animate: true
 
     property string inputString: "0"
@@ -54,6 +57,8 @@ Rectangle {
 
         var componentId = debug ? "DebugCell.qml" : "Cell.qml"
 
+        populationCount = 0
+
         for (var row = 0; row < rows; row++) {
             for (var col = 0; col < columns; col++) {
                 var component = Qt.createComponent(componentId)
@@ -70,6 +75,7 @@ Rectangle {
                 ages.splice(index, 0, 0)
 
                 index++
+                populationCount++
                 rowPosition += debug ? 32 + gridSpacing : 16 + gridSpacing
             }
 
@@ -86,6 +92,8 @@ Rectangle {
         else {
             worldGrid.anchors.fill = root
         }
+
+        stats.updateStatistics()
     }
 
     function toggleSelector(toggle) {
@@ -123,6 +131,12 @@ Rectangle {
         }
     }
 
+    function toggleSelectorHighlight(toggle) {
+        for (var index in selectorGrid) {
+            selectorGrid[index].occupied = toggle
+        }
+    }
+
     function generationProcess() {
         for (var index = generationProcessIndex; index < grid.length; index += columns) {
             grid[index].occupied = true
@@ -149,16 +163,20 @@ Rectangle {
         worldActive = false
         toggleSelector(false)
 
+        generations = 0
+        populationCount = 0
+
         if (playActive) {
-            playTextTransitionPhaseI.start()
             playActive = false
 
-            transitionToPause.start()
+            sidepanel.setPause()
             worldClock.stop()
         }
 
         setAnimation(true)
         resetProcess()
+
+        stats.updateStatistics()
     }
 
     function resetProcess() {
@@ -275,10 +293,18 @@ Rectangle {
             population[index] = newGeneration[index]
         }
 
+        populationCount = 0
         for (index = 0; index < newGeneration.length; index++) {
             var cellInTransition = grid[index]
             cellInTransition.occupied = newGeneration[index]
+
+            if (cellInTransition.occupied) {
+                populationCount++
+            }
         }
+
+        generations++
+        stats.updateStatistics()
     }
 
     function incrementCycleOld() {
@@ -603,463 +629,10 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
     }
 
-
-    Rectangle {
-        id: sidePanel
-        x: 1920
-        y: 0
-        width: 200
-        height: 980
-        color: "transparent"
-        clip: true
-
-        Behavior on x {
-            NumberAnimation { duration: 240; easing.type: Easing.OutCurve }
-        }
-
-        Rectangle {
-            anchors.fill: sidePanel
-            color: "black"
-            opacity: 0.86
-        }
-
-        // Menu
-
-        Text {
-            id: menuText
-            x: 64
-            y: 138
-            width: 128
-            height: 56
-            color: "#ffffff"
-            text: "MENU"
-            font.pixelSize: 40
-            verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignLeft
-
-            Behavior on scale {
-                ScaleAnimator { duration: 120 }
-            }
-        }
-
-        Text {
-            id: closeIndicator
-            x: 18
-            y: 138
-            width: 34
-            height: 56
-            color: Color.redTint
-            text: "X"
-            scale: 0
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            font.pixelSize: 40
-        }
-
-        Text {
-            id: menuIndicator
-            x: 18
-            y: 136
-            width: 34
-            height: 56
-            color: "#ffffff"
-            text: "<"
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            font.pixelSize: 40
-        }
-
-        ParallelAnimation {
-            id: transitionToMenu
-            running: false
-
-            NumberAnimation {
-                target: menuIndicator
-                property: "x"
-                from: 16
-                to: -34
-                duration: 120
-            }
-
-            ScaleAnimator {
-                target: closeIndicator
-                from: 0
-                to: 0.75
-                duration: 120
-            }
-        }
-
-        ParallelAnimation {
-            id: transitionFromMenu
-            running: false
-
-            NumberAnimation {
-                target: menuIndicator
-                property: "x"
-                from: 66
-                to: 16
-                duration: 120
-            }
-
-            OpacityAnimator {
-                target: menuIndicator
-                from: 0
-                to: 1
-                duration: 120
-            }
-
-            ScaleAnimator {
-                target: closeIndicator
-                from: 0.75
-                to: 0
-                duration: 120
-            }
-        }
-
-        // Play
-
-        Text {
-            id: playText
-            x: 64
-            y: 785
-            width: 128
-            height: 56
-            color: "#ffffff"
-            text: "PLAY"
-            horizontalAlignment: Text.AlignLeft
-            verticalAlignment: Text.AlignVCenter
-            font.pixelSize: 40
-
-            Behavior on scale {
-                ScaleAnimator { duration: 120 }
-            }
-        }
-
-        Text {
-            id: pauseIndicator
-            x: 18
-            y: 783
-            width: 34
-            height: 56
-            color: "#ffffff"
-            text: "||"
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            scale: 0
-            font.pixelSize: 40
-        }
-
-        Text {
-            id: playIndicator
-            x: 18
-            y: 783
-            width: 34
-            height: 56
-            color: "#ffffff"
-            text: ">"
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            font.pixelSize: 40
-        }
-
-        Rectangle {
-            id: colorTextFrame
-            x: 65
-            y: 450
-            width: 127
-            height: 81
-            color: "transparent"
-
-            Text {
-                x: 0
-                y: 0
-                width: 111
-                height: 56
-                color: "#ffffff"
-                text: "COLOR"
-                verticalAlignment: Text.AlignVCenter
-                font.pixelSize: 34
-                horizontalAlignment: Text.AlignLeft
-            }
-
-            Text {
-                x: 0
-                y: 37
-                width: 111
-                height: 37
-                color: "#ffffff"
-                text: "PALETTE"
-                verticalAlignment: Text.AlignVCenter
-                font.pixelSize: 27
-                horizontalAlignment: Text.AlignLeft
-            }
-
-            Behavior on scale {
-                ScaleAnimator { duration: 120 }
-            }
-        }
-
-        Rectangle {
-            x: 34
-            y: 490
-            width: 16
-            height: 16
-            radius: 8
-            color: colorPaletteHovered ? Color.blueTint : "white"
-
-            Behavior on color {
-                ColorAnimation { duration: 120 }
-            }
-        }
-
-        Rectangle {
-            x: 34
-            y: 473
-            width: 16
-            height: 16
-            radius: 8
-            color: colorPaletteHovered ? Color.greenTint : "white"
-
-            Behavior on color {
-                ColorAnimation { duration: 120 }
-            }
-        }
-
-        Rectangle {
-            x: 19
-            y: 482
-            width: 16
-            height: 16
-            radius: 8
-            color: colorPaletteHovered ? Color.redTint : "white"
-
-            Behavior on color {
-                ColorAnimation { duration: 120 }
-            }
-        }
-
-        ParallelAnimation {
-            id: transitionToPlay
-            running: false
-
-            NumberAnimation {
-                target: playIndicator
-                property: "x"
-                from: 16
-                to: 66
-                duration: 120
-            }
-
-            OpacityAnimator {
-                target: playIndicator
-                from: 1
-                to: 0
-                duration: 120
-            }
-
-            ScaleAnimator {
-                target: pauseIndicator
-                from: 0
-                to: 0.75
-                duration: 120
-            }
-        }
-
-        ParallelAnimation {
-            id: transitionToPause
-            running: false
-
-            NumberAnimation {
-                target: playIndicator
-                property: "x"
-                from: -34
-                to: 16
-                duration: 120
-            }
-
-            OpacityAnimator {
-                target: playIndicator
-                from: 0
-                to: 1
-                duration: 60
-            }
-
-            ScaleAnimator {
-                target: pauseIndicator
-                from: 0.75
-                to: 0
-                duration: 120
-            }
-        }
-
-        ParallelAnimation {
-            id: playTextTransitionPhaseI
-            OpacityAnimator {
-                target: playText
-                from: 1
-                to: 0
-                duration: 80
-            }
-
-            ScaleAnimator {
-                target: playText
-                from: 1.1
-                to: 0.9
-                duration: 80
-            }
-
-            onStopped: playTransition()
-        }
-
-        ParallelAnimation {
-            id: playTextTransitionPhaseII
-            OpacityAnimator {
-                target: playText
-                from: 0
-                to: 1
-                duration: 80
-            }
-
-            ScaleAnimator {
-                target: playText
-                from: 0.9
-                to: 1.1
-                duration: 80
-            }
-        }
-
-    }
-
-    function playTransition() {
-        playText.text = playActive ? "PAUSE" : "PLAY"
-        playTextTransitionPhaseII.start()
-    }
-
-    MouseArea {
-        id: menuMouse
+    Sidepanel {
+        id: sidepanel
         x: 1720
         y: 0
-        width: 200
-        height: 326
-        hoverEnabled: true
-
-        onEntered: {
-            if (!previewMode) {
-                menuText.scale = 1.1
-                sidePanel.x = 1720
-            }
-        }
-
-        onExited: {
-            menuText.scale = 1
-            if (!menuActive) {
-                sidePanel.x = 1920
-            }
-        }
-
-        onPressed: {
-            menuText.scale = 1.05
-
-            if (!menuActive) {
-                colorPalette.dismissPalette()
-
-                menuActive = true
-
-                transitionToMenu.start()
-                controls.present()
-            }
-            else {
-                menuActive = false
-
-                transitionFromMenu.start()
-                controls.dismiss()
-            }
-        }
-        onReleased: menuText.scale = 1.1
-    }
-
-    MouseArea {
-        id: colorMouse
-        x: 1720
-        y: 327
-        width: 200
-        height: 326
-        hoverEnabled: true
-
-        onEntered: {
-            if (worldActive && !previewMode) {
-                colorPaletteHovered = true
-                colorTextFrame.scale = 1.1
-                sidePanel.x = 1720
-            }
-        }
-
-        onExited: {
-            colorPaletteHovered = false
-            colorTextFrame.scale = 1
-
-            if (!menuActive) {
-                sidePanel.x = 1920
-            }
-        }
-
-        onPressed: {
-            if (worldActive) {
-                if (menuActive) {
-                    menuActive = false
-
-                    transitionFromMenu.start()
-                    controls.dismiss()
-                }
-
-                colorPalette.presentPalette()
-                colorTextFrame.scale = 1.05
-            }
-        }
-
-        onReleased: colorTextFrame.scale = worldActive ? 1.1 : 1
-    }
-
-    MouseArea {
-        id: playMouse
-        x: 1720
-        y: 654
-        width: 200
-        height: 326
-        hoverEnabled: true
-
-        onEntered: {
-            if (worldActive && !previewMode) {
-                playText.scale = 1.1
-                sidePanel.x = 1720
-            }
-        }
-
-        onExited: {
-            playText.scale = 1
-            if (!menuActive) {
-                sidePanel.x = 1920
-            }
-        }
-
-        onPressed: {
-           if (worldActive) {
-               playTextTransitionPhaseI.start()
-
-               if (!playActive) {
-                   playActive = true
-
-                   transitionToPlay.start()
-                   play()
-               }
-               else {
-                   playActive = false
-
-                   transitionToPause.start()
-                   worldClock.stop()
-               }
-           }
-        }
     }
 
     Controls {
@@ -1077,6 +650,7 @@ Rectangle {
         onAnimationEnabled: { setAnimation(status); animate = status }
         onIntervalGenerated: cycleInterval = interval
         onSpacingSelected: gridSpacing = spacing
+        onHighlightGridSwitched: { gridHighlight = highlight; toggleSelectorHighlight(highlight) }
     }
 
     ColorPalette {
@@ -1086,6 +660,10 @@ Rectangle {
             shades = colorArray
             colorGenerationProcess()
         }
+    }
+
+    Statistics {
+        id: stats
     }
 
     CustomButton {
@@ -1106,7 +684,9 @@ Rectangle {
 
             opacity = 0
             scale = 0.8
-            sidePanel.x = 1720
+            sidepanel.dismissSidepanel()
+
+            if (gridHighlight) toggleSelectorHighlight(true)
         }
 
         Behavior on opacity {

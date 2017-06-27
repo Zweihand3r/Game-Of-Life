@@ -29,5 +29,9 @@ MouseArea {
         border.color: "white"
         rotation: isDiamond ? 45 : 0
         radius: isCircle ? 8 : 0
+
+        Behavior on border.width {
+            NumberAnimation { duration: 120 }
+        }
     }
 }

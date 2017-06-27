@@ -23,9 +23,13 @@ Rectangle {
         case 6: period3PulsarGeneration(4 + columns * 4); break
         case 7: period15PentadecathlonGeneration(4 + columns * 4); break
         }
+
+        generations = 0
+        stats.updatePopulation()
     }
 
     function previewAction() {
+        if (gridHighlight) toggleSelectorHighlight(false)
         for (var index = 0; index < population.length; index++) {
             grid[index].occupied = false
         }
@@ -33,9 +37,9 @@ Rectangle {
         previewMode = true
         menuActive = false
 
-        transitionFromMenu.start()
+        sidepanel.transitionFromMenu()
         controls.dismiss()
-        sidePanel.x = 1920
+        sidepanel.dismissSidepanel()
 
         donePreviewButton.opacity = 1
         donePreviewButton.scale = 1
@@ -55,6 +59,9 @@ Rectangle {
         case 6: period3PulsarGeneration(currentHoveredIndex); break
         case 7: period15PentadecathlonGeneration(currentHoveredIndex); break
         }
+
+        generations = 0
+        stats.updatePopulation()
     }
 
     function clearFillGeneration() {
