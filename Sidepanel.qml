@@ -27,6 +27,10 @@ Rectangle {
         sidepanelContent.x = 200
     }
 
+    function presentSidepanel() {
+        sidepanelContent.x = 0
+    }
+
     Rectangle {
         id: sidepanelContent
         x: 200

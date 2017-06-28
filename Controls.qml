@@ -642,7 +642,7 @@ Rectangle {
 
     CustomSwitch {
         id: animateSwitch
-        x: 1376
+        x: 1345
         y: 311
         checked: true
         font.pixelSize: 25

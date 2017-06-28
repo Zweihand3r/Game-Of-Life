@@ -559,7 +559,7 @@ Rectangle {
             anchors.bottomMargin: 0
             anchors.leftMargin: 0
             anchors.topMargin: 0
-            color: "black"//"transparent"
+            color: "transparent"
             visible: false
 
             ColorButton {
@@ -1129,6 +1129,8 @@ Rectangle {
             button.onText = step
             resetSetFunction()
         }
+
+        dismissSliders()
     }
 
     function setSliderValuesToTarget() {

@@ -420,10 +420,18 @@ Rectangle {
         else {
             switch (colorPalette.paletteIndex) {
             case 1:
-                for (index = colorGenerationIndex; index < grid.length; index += columns) {
-                    grid[index].color = shades[0]
+                if (playActive) {
+                    for (index = colorGenerationIndex; index < grid.length; index++) {
+                        grid[index].color = shades[0]
+                    }
+                    return
                 }
-                break
+                else {
+                    for (index = colorGenerationIndex; index < grid.length; index += columns) {
+                        grid[index].color = shades[0]
+                    }
+                    break
+                }
 
             case -1:
             case 2:
@@ -684,7 +692,7 @@ Rectangle {
 
             opacity = 0
             scale = 0.8
-            sidepanel.dismissSidepanel()
+            sidepanel.presentSidepanel()
 
             if (gridHighlight) toggleSelectorHighlight(true)
         }
