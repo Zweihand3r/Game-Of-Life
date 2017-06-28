@@ -22,8 +22,11 @@ Rectangle {
     property var presetCombos: [false, false, false, false, false, false, false, false]
 
     property int presetSwitchIterator: 0
+    property int dynamicIndex: 0
+    property int dynamicIndexMax: 1
 
     property var buttons: [redButton1, redButton, greenButton, blueButton, purpleButton, yellowButton, cyanButton, cyanButton1]
+    property var currentSliderTarget: dynamicButton1
 
     Behavior on scale {
         ScaleAnimator { duration: 160 }
@@ -66,6 +69,8 @@ Rectangle {
             return
         }
 
+        dismissSliders()
+
         if (paletteIndex == -1 || paletteIndex == 1) {
             expandingOne.rotation = 60
             expandingOne.opacity = 0
@@ -93,6 +98,8 @@ Rectangle {
         advancedRadial.selected = index === 2 // 3
 
         paletteIndex = index
+
+        dismissSliders()
 
         switch (index) {
         case -1:
@@ -308,12 +315,12 @@ Rectangle {
         var colors = [dynamicButton1.tint, dynamicButton2.tint]
         var steps = [parseInt(dynamicSetButton1.onText)]
 
-        if (!dynamicButton3.addMode) {
+        if (dynamicButton3.modeIndex == 0) {
             colors.push(dynamicButton3.tint)
             steps.push(parseInt(dynamicSetButton2.onText))
         }
 
-        if (!dynamicButton4.addMode) {
+        if (dynamicButton4.modeIndex == 0) {
             colors.push(dynamicButton4.tint)
             steps.push(parseInt(dynamicSetButton3.onText))
         }
@@ -692,11 +699,13 @@ Rectangle {
                 id: dynamicButton1
                 x: 208
                 y: 30
-                tint: "#114357"
+                tint: "#FFFFFF"
                 enableGradient: false
-                addMode: false
+//                addMode: false
+                modeIndex: 0
                 connected: true
                 switchState: true
+                onSwitchedOn: colorButtonPressed(dynamicButton1)
             }
 
             ToggleButton {
@@ -707,20 +716,23 @@ Rectangle {
                 square: true
                 diamond: true
                 onText: "32"
-                offText: "32"
+                offText: "Set"
                 connected: true
                 switchState: true
+                onSwitchedOn: functionButtonPressed(dynamicSetButton1)
             }
 
             ColorButton {
                 id: dynamicButton2
                 x: 390
                 y: 208
-                tint: "#f29492"
+                tint: "#000000"
                 enableGradient: false
-                addMode: false
+//                addMode: false
+                modeIndex: 0
                 connected: true
                 switchState: true
+                onSwitchedOn: colorButtonPressed(dynamicButton2)
             }
 
             ToggleButton {
@@ -734,15 +746,19 @@ Rectangle {
                 offText: "Set"
                 connected: true
                 switchState: true
+                onSwitchedOn: functionButtonPressed(dynamicSetButton2)
             }
 
             ColorButton {
                 id: dynamicButton3
                 x: 208
                 y: 383
-                tint: "white"
+                tint: "#FFFFFF"
                 enableGradient: false
-                addMode: true
+//                addMode: true
+                modeIndex: 1
+                connected: true
+                onSwitchedOn: colorButtonPressed(dynamicButton3)
             }
 
             ToggleButton {
@@ -756,16 +772,20 @@ Rectangle {
                 offText: "Set"
                 connected: true
                 scale: 0
+                onSwitchedOn: functionButtonPressed(dynamicSetButton3)
             }
 
             ColorButton {
                 id: dynamicButton4
                 x: 27
                 y: 208
-                tint: "white"
+                tint: "#FFFFFF"
                 enableGradient: false
-                addMode: true
+//                addMode: true
+                modeIndex: 1
                 scale: 0
+                connected: true
+                onSwitchedOn: colorButtonPressed(dynamicButton4)
             }
 
             ToggleButton {
@@ -779,6 +799,7 @@ Rectangle {
                 offText: "Set"
                 connected: true
                 scale: 0
+                onSwitchedOn: functionButtonPressed(dynamicSetButton4)
             }
         }
     }
@@ -894,6 +915,276 @@ Rectangle {
                     onPressed: radialSelection(2)
                 }
             }
+        }
+
+        Rectangle {
+            id: sliderFrame
+            x: 0
+            y: 0
+            width: 240
+            height: 240
+            radius: 120
+            color: "#ffffff"
+            scale: 0
+
+            Behavior on scale {
+                ScaleAnimator { duration: 120 }
+            }
+
+            Behavior on color {
+                ColorAnimation { duration: 120 }
+            }
+
+            MouseArea {
+                anchors.fill: sliderFrame
+            }
+
+            Rectangle {
+                id: sliderBackground
+                x: 10
+                y: 10
+                width: 220
+                height: 220
+                radius: 110
+                color: "#ffffff"
+            }
+
+            CustomSlider {
+                id: redSlider
+                x: 20
+                y: 57
+                value: 255
+                from: 0
+                to: 255
+                minTrackColor: Color.redTint
+                onValueChanged: colorSliderAction()
+            }
+
+            CustomSlider {
+                id: greenSlider
+                x: 20
+                y: 101
+                value: 255
+                from: 0
+                to: 255
+                minTrackColor: Color.greenTint
+                onValueChanged: colorSliderAction()
+            }
+
+            CustomSlider {
+                id: blueSlider
+                x: 20
+                y: 149
+                value: 255
+                from: 0
+                to: 255
+                minTrackColor: Color.blueTint
+                onValueChanged: colorSliderAction()
+            }
+
+            CustomButton {
+                id: setButton
+                x: 81
+                y: 20
+                width: 80
+                height: 24
+                text: "Set"
+                buttonFont: 18
+                onClicked: setSliderValuesToTarget()
+            }
+
+            CustomButton {
+                id: cancelButton
+                x: 81
+                y: 196
+                width: 80
+                height: 24
+                text: "Cancel"
+                buttonFont: 18
+                onClicked: dismissSliders()
+            }
+        }
+    }
+
+    // Dynamic Functions
+
+    function setSlidersToColor(color) {
+        var redHex = getRed(color)
+        var greenHex = getGreen(color)
+        var blueHex = getBlue(color)
+
+        var red = parseFloat(redHex, 16)
+        var green = parseFloat(greenHex, 16)
+        var blue = parseFloat(blueHex, 16)
+
+        redSlider.value = red
+        greenSlider.value = green
+        blueSlider.value = blue
+    }
+
+    function colorSliderAction() {
+        var red = parseInt(redSlider.value)
+        var green = parseInt(greenSlider.value)
+        var blue = parseInt(blueSlider.value)
+
+        var redHex = red < 16 ? "0" + red.toString(16) : red.toString(16)
+        var greenHex = green < 16 ? "0" + green.toString(16) : green.toString(16)
+        var blueHex = blue < 16 ? "0" + blue.toString(16) : blue.toString(16)
+
+        var color = "#" + redHex + greenHex + blueHex
+        sliderFrame.color = color
+    }
+
+    function presentSliders() {
+        sliderFrame.scale = 1
+    }
+
+    function dismissSliders() {
+        if (currentSliderTarget.modeIndex === -1) {
+            currentSliderTarget.modeIndex = 0
+        }
+
+        sliderFrame.scale = 0
+    }
+
+    function resetDynamicButtons(button) {
+        console.log("reset")
+        switch (button) {
+        case dynamicButton3:
+            console.log("button3")
+            dynamicSetButton4.scale = 0
+
+            dynamicButton4.tint = "#FFFFFF"
+            dynamicButton4.modeIndex = 1
+            dynamicButton4.scale = 0
+
+            dynamicSetButton3.scale = 0
+
+            dynamicButton3.tint = "#FFFFFF"
+            dynamicButton3.modeIndex = 1
+
+            dynamicSetButton2.onText = "Set"
+            dynamicSetButton2.switchState = false
+            break
+
+        case dynamicButton4:
+            console.log("button4")
+            dynamicSetButton4.scale = 0
+
+            dynamicButton4.tint = "#FFFFFF"
+            dynamicButton4.modeIndex = 1
+
+            dynamicSetButton3.onText = "Set"
+            dynamicSetButton3.switchState = false
+            break
+        }
+
+        dismissSliders()
+    }
+
+    function colorButtonPressed(button) {
+        if (currentSliderTarget.modeIndex === -1 && currentSliderTarget !== button) {
+            currentSliderTarget.modeIndex = 0
+        }
+
+        currentSliderTarget = button
+        setSlidersToColor(button.tint)
+        presentSliders()
+
+        switch (button) {
+        case dynamicButton1: dynamicIndex = 0; break
+        case dynamicButton2: dynamicIndex = 1; break
+        case dynamicButton3:
+            dynamicIndex = 2
+
+            switch (button.modeIndex) {
+            case -1: resetDynamicButtons(button); break
+            case 0: button.modeIndex = -1; break
+            }
+            break
+
+        case dynamicButton4:
+            dynamicIndex = 3
+
+            switch (button.modeIndex) {
+            case -1: resetDynamicButtons(button); break
+            case 0: button.modeIndex = -1; break
+            }
+            break
+        }
+    }
+
+    function functionButtonPressed(button) {
+        if (button.onText === "Set") {
+            generateAgeShades()
+        }
+        else {
+            var step = parseInt(button.onText)
+            step *= 2
+
+            if (step > 9999) {
+                step = 1
+            }
+
+            button.onText = step
+            resetSetFunction()
+        }
+    }
+
+    function setSliderValuesToTarget() {
+        if (currentSliderTarget.modeIndex === -1) {
+            currentSliderTarget.modeIndex = 0
+        }
+
+        currentSliderTarget.tint = sliderFrame.color
+        dismissSliders()
+
+        if (dynamicIndexMax < dynamicIndex) {
+            dynamicIndexMax = dynamicIndex
+        }
+
+        switch (dynamicIndex) {
+        case 0:
+        case 1:
+            break
+
+        case 2:
+            if (dynamicButton3.modeIndex == 1) {
+                dynamicButton3.modeIndex = 0
+                dynamicButton3.switchState = true
+
+                dynamicSetButton2.onText = "32"
+                dynamicSetButton2.switchState = true
+
+                dynamicSetButton3.switchState = false
+                dynamicSetButton3.scale = 1
+
+                dynamicButton4.scale = 1
+            }
+            break
+
+        case 3:
+            if (dynamicButton4.modeIndex == 1) {
+                dynamicButton4.modeIndex = 0
+                dynamicButton4.switchState = true
+
+                dynamicSetButton3.onText = "32"
+                dynamicSetButton3.switchState = true
+
+                dynamicSetButton4.switchState = false
+                dynamicSetButton4.scale = 1
+            }
+            break
+        }
+
+        resetSetFunction()
+    }
+
+    function resetSetFunction() {
+        switch (dynamicIndexMax) {
+        case 1: dynamicSetButton2.switchState = false; break
+        case 2: dynamicSetButton3.switchState = false; break
+        case 3: dynamicSetButton4.switchState = false; break
         }
     }
 
