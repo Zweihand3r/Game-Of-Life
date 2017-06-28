@@ -24,6 +24,7 @@ Rectangle {
     signal animationEnabled(bool status)
     signal intervalGenerated(int interval)
     signal spacingSelected(int spacing)
+    signal highlightGridSwitched(bool highlight)
 
     function present() {
         visible = true
@@ -641,8 +642,8 @@ Rectangle {
 
     CustomSwitch {
         id: animateSwitch
-        x: 1377
-        y: 363
+        x: 1376
+        y: 311
         checked: true
         font.pixelSize: 25
         text: qsTr("Animate")
@@ -663,12 +664,14 @@ Rectangle {
         font.pixelSize: 25
     }
 
-    RuleSets {
-        id: ruleSets
-        x: 191
-        y: 125
-        width: 1032
-        height: 172
+    CustomSwitch {
+        id: highlightSwitch
+        x: 1345
+        y: 363
+        text: qsTr("Grid Highlight")
+        font.pixelSize: 25
+        checked: false
+        onCheckedChanged: root.highlightGridSwitched(checked)
     }
 
     CustomDial {
@@ -683,7 +686,13 @@ Rectangle {
         onValueChanged: root.intervalGenerated(parseInt(value))
     }
 
-
+    RuleSets {
+        id: ruleSets
+        x: 191
+        y: 125
+        width: 1032
+        height: 172
+    }
 
     Component.onCompleted: {
         generation.state = 'reset'

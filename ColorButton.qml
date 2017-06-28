@@ -21,6 +21,7 @@ Button {
     property bool connected: false
     property bool enableGradient: false
     property bool addMode: false
+    property int modeIndex: 0
 
     function switchMode() {
         scale = 0
@@ -32,6 +33,14 @@ Button {
         scale = 1
     }
 
+    function setTitle() {
+        switch (modeIndex) {
+        case -1: return "-"
+        case 0: return ""
+        case 1: return "+"
+        }
+    }
+
     Timer {
         id: switchTimer
         running: false
@@ -40,13 +49,13 @@ Button {
     }
 
     contentItem: Text {
-        text: "+"
+        text: setTitle()
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
-        color: "#ffffff"
+        color: tint
         font.pixelSize: 45
         bottomPadding: 6
-        scale: addMode ? 1 : 0
+        scale: modeIndex != 0 ? 1 : 0
 
         Behavior on scale {
             ScaleAnimator { duration: 80 }
@@ -66,7 +75,7 @@ Button {
             height: control.height - 20
             radius: dimension / 2
             color: tint
-            scale: switchState && !addMode ? 1 : 0
+            scale: switchState && (modeIndex == 0) ? 1 : 0
 
             Behavior on scale {
                 ScaleAnimator { duration: 120 }

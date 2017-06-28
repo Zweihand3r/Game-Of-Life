@@ -23,5 +23,9 @@
         <file>SelectorCell.qml</file>
         <file>PopulationControl.qml</file>
         <file>PopulationDelagate.qml</file>
+        <file>Statistics.qml</file>
+        <file>Sidepanel.qml</file>
+        <file>Temp.qml</file>
+        <file>CustomSlider.qml</file>
     </qresource>
 </RCC>
